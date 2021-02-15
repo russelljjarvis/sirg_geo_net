@@ -2,11 +2,9 @@ scikit-image
 selenium
 pyvirtualdisplay
 fsspec>=0.3.3
-
 streamlit
 jupyter-server-proxy==1.2.0
 nbserverproxy==0.8.8
-
 tabulate
 tqdm
 pipenv
@@ -15,7 +13,13 @@ networkx
 pyviz
 holoviews
 bokeh
+#xarray
+#datashader
+pandapower
 #seaborn
 #regex
 #twython
-#chart_studio
+chart_studio
+plotly
+tabulate
+colorlover

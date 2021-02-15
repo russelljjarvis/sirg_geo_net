@@ -22,7 +22,7 @@ hv.extension('bokeh', logo=False)
 hv.output(size=100)
 author_list = [None,
 "Brian H Smith",
-"Christian C Rabeling",
+"Christian Rabeling",
 "Jon F Harrison",
 "Juergen Liebig",
 "Stephen C Pratt",
@@ -41,7 +41,7 @@ def main():
 	with open('Brian H Smith_df.p',"rb") as f:
 		df = pickle.load(f)
 
-	options = [125,150,175,200,50,75,100]
+	options = [150,175,200,50,75,100,125]
 	figure_size = st.sidebar.radio("Figure size (smaller-faster)",options)
 	hv.output(size=figure_size)
 
@@ -83,17 +83,24 @@ def main():
 					 xaxis=None, yaxis=None,tools=['hover','tap'],node_size=10,
 					 cmap = ['blue','orange'])
 	st.write(hv.render(graph, backend='bokeh'))
-	edge_list = networkx.to_edgelist(g)
+	#edge_list = networkx.to_edgelist(g)
 	#label="Coauthorship Network for: "+MAIN_AUTHOR
-	chord = hv.Chord(edge_list,label=label)#.opts(tools=['hover','tap'],node_size=10,
+	#chord = hv.Chord(edge_list)#label=label)#.opts(tools=['hover','tap'],node_size=10,
 	#node_color='type',
  	#cmap = ['blue','orange'])
-	chord.opts(color_index='circle', width=350, height=350, show_frame=False,
-					 xaxis=None, yaxis=None)
-	st.write(hv.render(chord, backend='bokeh'))
+	#chord.opts(color_index='circle', width=350, height=350, show_frame=False,
+	#				 xaxis=None, yaxis=None)#,label=label)
+	label="Coauthorship Chord Network for: "+MAIN_AUTHOR
+	st.markdown(label)
+
+	#st.write(hv.render(chord, backend='bokeh'))
 	#st.text(dir(g))
 	###
-
+	import chord2
+	#edges_df = networkx.to_pandas_edgelist(g)
+	edges_df = networkx.to_pandas_adjacency(g)
+	fig = chord2.make_filled_chord(edges_df)
+	st.write(fig)
 	###
 	if 'df' in locals():
 		st.markdown(""" ### Here are some of the publications we are using to build the networks. """)

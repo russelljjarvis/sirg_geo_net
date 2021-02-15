@@ -5,6 +5,7 @@ import streamlit as st
 import pandas as pd
 import networkx
 import pickle
+import numpy as np
 def university_data_frame():
 	import pandas as pd
 	world_universities = pd.read_csv("world-universities.csv")
@@ -35,7 +36,7 @@ def network(coauthors,MAIN_AUTHOR):
 	g = networkx.DiGraph()
 	exhaustive_coath = {}
 	cnt = 0
-	node_type = np.array(['type1']*17 + ['type2']*17).reshape(34)
+	#node_type = np.array(['type1']*17 + ['type2']*17).reshape(34)
 
 	for title,mini_net in coauthors:
 		for names in mini_net:
@@ -43,10 +44,10 @@ def network(coauthors,MAIN_AUTHOR):
 			if key not in exhaustive_coath.keys():
 				exhaustive_coath[key] = 1
 				g.add_node(key, label=title)
-				if key in MAIN_AUTHOR:
-					g['type'] = node_type[1]
-				else:
-					g['type'] = node_type[0]
+				#if key in MAIN_AUTHOR:
+				#	g['type'] = node_type[1]
+				#else:
+				#	g['type'] = node_type[0]
 			else:
 				exhaustive_coath[key] += 1
 			cnt+=1
