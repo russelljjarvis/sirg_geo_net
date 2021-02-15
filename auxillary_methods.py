@@ -1,6 +1,8 @@
 from typing import Any, Dict, List, Optional, Tuple, Type, Union, Text
 import requests
-
+from tqdm import tqdm
+import streamlit as st
+import pandas as pd
 import networkx
 import pickle
 def university_data_frame():
@@ -9,8 +11,6 @@ def university_data_frame():
 	world_universities.rename(columns={"AD":"country","University of Andorra":"university","http://www.uda.ad/":"wesbite"},inplace=True)
 
 
-from tqdm import tqdm
-import streamlit as st
 
 
 class tqdm:
@@ -34,21 +34,25 @@ class tqdm:
 def network(coauthors,MAIN_AUTHOR):
 	g = networkx.DiGraph()
 	exhaustive_coath = {}
-	#MAX = 100
 	cnt = 0
+	node_type = np.array(['type1']*17 + ['type2']*17).reshape(34)
+
 	for title,mini_net in coauthors:
 		for names in mini_net:
-			#if cnt<100:
 			key = names['name']['first']+str(" ")+names['name']['last']
 			if key not in exhaustive_coath.keys():
 				exhaustive_coath[key] = 1
 				g.add_node(key, label=title)
+				if key in MAIN_AUTHOR:
+					g['type'] = node_type[1]
+				else:
+					g['type'] = node_type[0]
 			else:
 				exhaustive_coath[key] += 1
 			cnt+=1
 	node_strengths = exhaustive_coath
 	if cnt>100:
-		st.markdown(""" Warning Huge number of collaborators {0} building network will take time ... """.format(cnt))
+		st.markdown(""" Warning large number of collaborators {0} building network will take time ... """.format(cnt))
 
 	for title,mini_net in tqdm(coauthors,title='queried authors, now building network structure'):
 		# build small worlds
@@ -61,15 +65,14 @@ def network(coauthors,MAIN_AUTHOR):
 				if i!=j:
 					g.add_edge(keyi, keyj,weight=node_strengths[keyi])
 	return g
-import pandas as pd
 
 
 
 def make_clickable(link):
-    # target _blank to open new window
-    # extract clickable text to display for your link
-    text = link#.split('=')[1]
-    return f'<a target="_blank" href="{link}">{text}</a>'
+	# target _blank to open new window
+	# extract clickable text to display for your link
+	text = link#.split('=')[1]
+	return f'<a target="_blank" href="{link}">{text}</a>'
 
 def author_to_coauthor_network(name:str = "") -> networkx.DiGraph():
 	response = requests.get("https://dissem.in/api/search/?authors="+str(name))
@@ -87,14 +90,18 @@ def author_to_coauthor_network(name:str = "") -> networkx.DiGraph():
 		titles.append(title)
 		coauthors.append((title,coauthors_))
 		if "pdf_url" in p.keys():
-			#
 			temp = {"title":p["title"],"Web_Link":p["pdf_url"]}
 		else:
-			#,
 			temp = {"title":p["title"],"Web_Link":p['records'][0]['splash_url']}
 		list_of_dicts.append(temp)
 	df = pd.DataFrame(list_of_dicts)
+
+	with open(str(name)+"_df.p","wb") as f:
+		pickle.dump(df,f)
+
 	g = network(coauthors,name)
+	#with open(str(name)+".p","wb") as f:
+	#	pickle.dump(g,f)
 	return g,df
 
 def push_frame_to_screen(df_links):

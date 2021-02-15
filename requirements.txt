@@ -1,14 +1,13 @@
-regex
+scikit-image
 selenium
 pyvirtualdisplay
 fsspec>=0.3.3
-twython
+
 streamlit
 jupyter-server-proxy==1.2.0
 nbserverproxy==0.8.8
-seaborn
+
 tabulate
-chart_studio
 tqdm
 pipenv
 bokeh
@@ -16,3 +15,7 @@ networkx
 pyviz
 holoviews
 bokeh
+#seaborn
+#regex
+#twython
+#chart_studio
