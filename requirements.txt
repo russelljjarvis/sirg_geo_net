@@ -1,0 +1,35 @@
+<<<<<<< HEAD
+regex
+=======
+>>>>>>> e31e1339209a355999bbeebe1ddf4b6762854a7e
+PyPDF2
+pycld2
+nltk
+selenium
+delver
+pdfminer
+pyvirtualdisplay
+textstat
+fsspec>=0.3.3
+textblob
+twython
+streamlit
+jupyter-server-proxy==1.2.0
+nbserverproxy==0.8.8
+wordcloud
+seaborn
+bs4
+natsort
+dask
+plotly
+tabulate
+<<<<<<< HEAD
+chart_studio
+tqdm
+crossref-commons
+sklearn
+pipenv
+spacy-langdetect
+orcid
+=======
+>>>>>>> e31e1339209a355999bbeebe1ddf4b6762854a7e
