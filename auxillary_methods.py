@@ -31,7 +31,7 @@ class tqdm:
 
 
 
-def network(coauthors,MAIN_AUTHOR,df):
+def network(coauthors,MAIN_AUTHOR):
 	g = networkx.DiGraph()
 	exhaustive_coath = {}
 	#MAX = 100
@@ -49,8 +49,6 @@ def network(coauthors,MAIN_AUTHOR,df):
 	node_strengths = exhaustive_coath
 	if cnt>100:
 		st.markdown(""" Warning Huge number of collaborators {0} building network will take time ... """.format(cnt))
-		st.markdown(""" Here are some of the publications we are using to build the networks. """)
-		push_frame_to_screen(df)
 
 	for title,mini_net in tqdm(coauthors,title='queried authors, now building network structure'):
 		# build small worlds
@@ -89,15 +87,15 @@ def author_to_coauthor_network(name:str = "") -> networkx.DiGraph():
 		titles.append(title)
 		coauthors.append((title,coauthors_))
 		if "pdf_url" in p.keys():
-			#"title":p["title"],
-			temp = {"Web_Link":p["pdf_url"]}
+			#
+			temp = {"title":p["title"],"Web_Link":p["pdf_url"]}
 		else:
-			#"title":p["title"],
-			temp = {"Web_Link":p['records'][0]['splash_url']}
+			#,
+			temp = {"title":p["title"],"Web_Link":p['records'][0]['splash_url']}
 		list_of_dicts.append(temp)
 	df = pd.DataFrame(list_of_dicts)
-	g = network(coauthors,name,df)
-	return g
+	g = network(coauthors,name)
+	return g,df
 
 def push_frame_to_screen(df_links):
 	df_links.drop_duplicates(subset = "Web_Link", inplace = True)
