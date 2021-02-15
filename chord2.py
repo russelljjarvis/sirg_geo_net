@@ -291,6 +291,10 @@ def make_filled_chord(M):#,labels):
         layout['shapes'].append(make_ideo_shape(path,
                                                 'rgb(150,150,150)',
                                                 ideo_colors[k]))
+
+    layout['paper_bgcolor']='rgba(0,0,0,0)'
+    layout['plot_bgcolor']='rgba(0,0,0,0)'
+
     data = ideograms + ribbon_info
     fig = {
         "data": data,

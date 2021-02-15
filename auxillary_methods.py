@@ -84,6 +84,7 @@ def author_to_coauthor_network(name:str = "") -> networkx.DiGraph():
 
 	if len(author_papers['papers']) ==0:
 		st.markdown("""## That query lead to zero papers. \n Retry either adding or ommitting middle initial.""")
+
 		return None
 	for p in author_papers['papers']:
 		coauthors_ = p['authors']
