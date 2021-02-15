@@ -3,21 +3,56 @@ import requests
 
 import networkx
 import pickle
-def network(coauthors,MAIN_AUTHOR):
-	g = networkx.DiGraph()
+def university_data_frame():
+	import pandas as pd
+	world_universities = pd.read_csv("world-universities.csv")
+	world_universities.rename(columns={"AD":"country","University of Andorra":"university","http://www.uda.ad/":"wesbite"},inplace=True)
 
+
+from tqdm import tqdm
+import streamlit as st
+
+
+class tqdm:
+	def __init__(self, iterable, title=None):
+		if title:
+			st.write(title)
+		self.prog_bar = st.progress(0)
+		self.iterable = iterable
+		self.length = len(iterable)
+		self.i = 0
+
+	def __iter__(self):
+		for obj in self.iterable:
+			yield obj
+			self.i += 1
+			current_prog = self.i / self.length
+			self.prog_bar.progress(current_prog)
+
+
+
+def network(coauthors,MAIN_AUTHOR,df):
+	g = networkx.DiGraph()
 	exhaustive_coath = {}
+	#MAX = 100
+	cnt = 0
 	for title,mini_net in coauthors:
 		for names in mini_net:
+			#if cnt<100:
 			key = names['name']['first']+str(" ")+names['name']['last']
 			if key not in exhaustive_coath.keys():
 				exhaustive_coath[key] = 1
 				g.add_node(key, label=title)
 			else:
 				exhaustive_coath[key] += 1
-
+			cnt+=1
 	node_strengths = exhaustive_coath
-	for title,mini_net in coauthors:
+	if cnt>100:
+		st.markdown(""" Warning Huge number of collaborators {0} building network will take time ... """.format(cnt))
+		st.markdown(""" Here are some of the publications we are using to build the networks. """)
+		push_frame_to_screen(df)
+
+	for title,mini_net in tqdm(coauthors,title='queried authors, now building network structure'):
 		# build small worlds
 		# from projection
 		for i,namesi in enumerate(mini_net):
@@ -26,25 +61,50 @@ def network(coauthors,MAIN_AUTHOR):
 			for j,namesj in enumerate(mini_net):
 				keyj = namesj['name']['first']+str(" ")+namesj['name']['last']
 				if i!=j:
-					g.add_edge(keyi, keyj,weight=node_strengths[keyj])
-	with open(str(MAIN_AUTHOR)+".p","wb") as f:
-		pickle.dump(g,f)
-	with open(str(MAIN_AUTHOR)+".p","rb") as f:
-		g = pickle.load(f)
+					g.add_edge(keyi, keyj,weight=node_strengths[keyi])
 	return g
-def author_to_coauthor_network(name:str = "") -> List:
+import pandas as pd
+
+
+
+def make_clickable(link):
+    # target _blank to open new window
+    # extract clickable text to display for your link
+    text = link#.split('=')[1]
+    return f'<a target="_blank" href="{link}">{text}</a>'
+
+def author_to_coauthor_network(name:str = "") -> networkx.DiGraph():
 	response = requests.get("https://dissem.in/api/search/?authors="+str(name))
 	author_papers = response.json()
 	coauthors = []
 	titles = []
+	list_of_dicts = []
+
+	if len(author_papers['papers']) ==0:
+		st.markdown("""## That query lead to zero papers. \n Retry either adding or ommitting middle initial.""")
+		return None
 	for p in author_papers['papers']:
 		coauthors_ = p['authors']
 		title = p['title']
 		titles.append(title)
 		coauthors.append((title,coauthors_))
+		if "pdf_url" in p.keys():
+			#"title":p["title"],
+			temp = {"Web_Link":p["pdf_url"]}
+		else:
+			#"title":p["title"],
+			temp = {"Web_Link":p['records'][0]['splash_url']}
+		list_of_dicts.append(temp)
+	df = pd.DataFrame(list_of_dicts)
+	g = network(coauthors,name,df)
+	return g
 
+def push_frame_to_screen(df_links):
+	df_links.drop_duplicates(subset = "Web_Link", inplace = True)
+	df_links['Web_Link'] = df_links['Web_Link'].apply(make_clickable)
+	df_links = df_links.to_html(escape=False)
+	st.write(df_links, unsafe_allow_html=True)
 
-	return coauthors
 
 def get_cluster_id(url):
 	"""

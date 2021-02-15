@@ -15,7 +15,7 @@ def read_requirements():
     return reqs
 
 
-setup(name='scomplexity',
+setup(name='academic author network',
       version='1.0',
       description='heavily applied scraping, crawling and language analysis, tightly coupled with the goal of analysing scientific discourse',
       author='various',
