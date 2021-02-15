@@ -59,6 +59,8 @@ def main():
 	if author_name0 or author_name1:
 		st.markdown("""## You Chose the Author: {0} """.format(author_name))
 		g,df = author_to_coauthor_network(author_name)
+		#if g is None:
+		#	del g
 		MAIN_AUTHOR = author_name
 		if str("graph") in locals():
 			del graph

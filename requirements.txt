@@ -7,7 +7,6 @@ streamlit
 jupyter-server-proxy==1.2.0
 nbserverproxy==0.8.8
 seaborn
-shelve
 tabulate
 chart_studio
 tqdm
