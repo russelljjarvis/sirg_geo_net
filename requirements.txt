@@ -1,9 +1,6 @@
 regex
 selenium
-delver
-pdfminer
 pyvirtualdisplay
-textstat
 fsspec>=0.3.3
 textblob
 twython
@@ -15,11 +12,12 @@ seaborn
 bs4
 natsort
 dask
-plotly
 tabulate
 chart_studio
 tqdm
-sklearn
 pipenv
 bokeh
 networkx
+pyviz
+holoviews
+bokeh
