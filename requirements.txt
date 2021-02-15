@@ -1,10 +1,4 @@
-<<<<<<< HEAD
 regex
-=======
->>>>>>> e31e1339209a355999bbeebe1ddf4b6762854a7e
-PyPDF2
-pycld2
-nltk
 selenium
 delver
 pdfminer
@@ -23,13 +17,9 @@ natsort
 dask
 plotly
 tabulate
-<<<<<<< HEAD
 chart_studio
 tqdm
-crossref-commons
 sklearn
 pipenv
-spacy-langdetect
-orcid
-=======
->>>>>>> e31e1339209a355999bbeebe1ddf4b6762854a7e
+bokeh
+networkx
