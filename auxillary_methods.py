@@ -3,13 +3,131 @@ import requests
 from tqdm import tqdm
 import streamlit as st
 import pandas as pd
-import networkx
+import networkx as networkx
+
+nx = networkx
 import pickle
 import numpy as np
+import plotly.graph_objects as go
+import pandas as pd
+from datashader.bundling import hammer_bundle
+
+import numpy as np
+
+# Custom function to create an edge between node x and node y, with a given text and width
+def make_edge(x, y, text, width):
+    return go.Scatter(
+        x=x,
+        y=y,
+        line=dict(width=width, color="cornflowerblue"),
+        hoverinfo="text",
+        text=([text]),
+        mode="lines",
+    )
+
+
+def plotly_sized(g):
+    """
+    https://towardsdatascience.com/tutorial-network-visualization-basics-with-networkx-and-plotly-and-a-little-nlp-57c9bbb55bb9
+    """
+    pos_ = nx.fruchterman_reingold_layout(g)
+    #    x, y = pos_[node]
+
+    # pos_ = nx.spring_layout(g)
+    # For each edge, make an edge_trace, append to list
+    edge_trace = []
+    for edge in g.edges():
+        weight = 1 + g.edges()[edge]["weight"]
+        weight = 2.5 * np.log(weight)
+        # if weight => 5:
+
+        # print(weight)
+        if g.edges()[edge]["weight"] > 0:
+            char_1 = edge[0]
+            char_2 = edge[1]
+            x0, y0 = pos_[char_1]
+            x1, y1 = pos_[char_2]
+            text = char_1 + "--" + char_2 + ": " + str(g.edges()[edge]["weight"])
+            trace = make_edge(
+                [x0, x1, text],
+                [y0, y1, text],
+                text,
+                width=weight,
+            )
+            edge_trace.append(trace)
+
+    # Make a node trace
+    # for node in g.nodes():
+
+    # labels = [str(node) for node in g.nodes()]
+    node_trace = go.Scatter(
+        x=[],
+        y=[],
+        hoverinfo="none",
+        text=([text]),
+        mode="markers+text",
+        marker=dict(color=[], size=[], line=None),
+    )
+    # marker=dict(symbol='circle-dot',
+    #                            size=5,
+    #                            color='#6959CD',
+    #                            line=dict(color='rgb(50,50,50)', width=0.5))
+
+    # For each node in g, get the position and size and add to the node_trace
+    for node in g.nodes():
+        x, y = pos_[node]
+        # print(x,tuple(x),node_trace["x"])
+        node_trace["x"] += tuple([x])
+        node_trace["y"] += tuple([y])
+        # node_trace["marker"]["color"] += tuple(["cornflowerblue"])
+        # node_trace['marker']['size'] += tuple([5*g.nodes()[node]['size']])
+        node_trace["marker"]["size"] += tuple([0.45 * g.nodes()[node]["size"]])
+        node_trace["text"] += tuple(["<b>" + str(node) + "</b>"])
+    # Customize layout
+    layout = go.Layout(
+        paper_bgcolor="rgba(0,0,0,0)",  # transparent background
+        plot_bgcolor="rgba(0,0,0,0)",  # transparent 2nd background
+        xaxis={"showgrid": False, "zeroline": False},  # no gridlines
+        yaxis={"showgrid": False, "zeroline": False},  # no gridlines
+    )  # Create figure
+    layout["width"] = 725
+    layout["height"] = 725
+
+    fig = go.Figure(layout=layout)  # Add all edge traces
+    for trace in edge_trace:
+        fig.add_trace(trace)  # Add node trace
+    fig.add_trace(node_trace)  # Remove legend
+    fig.update_layout(showlegend=False)  # Remove tick labels
+    fig.update_xaxes(showticklabels=False)
+    fig.update_yaxes(showticklabels=False)  # Show figure
+    return fig
+    # fig.show()
+
+
+def data_shade(graph):
+    # from sklearn.decomposition import PCA
+    nodes = list(graph.nodes())
+    weights = (
+        np.asarray(list(map(lambda x: x[-1]["weight"], graph.edges(data=True)))) ** 2
+    )
+    pos_ = nx.fruchterman_reingold_layout(graph)
+    coords = []
+    for node in graph.nodes:
+        x, y = pos_[node]
+        coords.append((x, y))
+    nodes_py = [[name, pos[0], pos[1]] for name, pos in zip(nodes, coords)]
+    print(nodes_py)
+    ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
+    ds_edges_py = [
+        [int(n0.split("_")[1]), int(n1.split("_")[1])] for (n0, n1) in graph.edges
+    ]
+    ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
+    hb = hammer_bundle(ds_nodes, ds_edges)
+    fig = hb.plot(x="x", y="y", figsize=(9, 9))
+    return fig
 
 
 def university_data_frame():
-    import pandas as pd
 
     world_universities = pd.read_csv("world-universities.csv")
     world_universities.rename(
@@ -40,34 +158,38 @@ class tqdm:
 
 
 def network(coauthors, MAIN_AUTHOR):
-    g = networkx.DiGraph()
-    exhaustive_coath = {}
+
+    node_strengths = {}
     cnt = 0
-    # node_type = np.array(['type1']*17 + ['type2']*17).reshape(34)
+    titles = {}
+    for title, mini_net in coauthors:
+        for names in mini_net:
+            key = names["name"]["first"] + str(" ") + names["name"]["last"]
+            # titles[key] = title
+            if key not in node_strengths.keys():
+                node_strengths[key] = 1
+            else:
+                node_strengths[key] += 1
+            cnt += 1
+    g = networkx.DiGraph()
+    # for key,value in node_strengths.items():
+    #
 
     for title, mini_net in coauthors:
         for names in mini_net:
             key = names["name"]["first"] + str(" ") + names["name"]["last"]
-            if key not in exhaustive_coath.keys():
-                exhaustive_coath[key] = 1
-                g.add_node(key, label=title)
-                # if key in MAIN_AUTHOR:
-                # 	g['type'] = node_type[1]
-                # else:
-                # 	g['type'] = node_type[0]
-            else:
-                exhaustive_coath[key] += 1
-            cnt += 1
-    node_strengths = exhaustive_coath
+            g.add_node(key, label=title, size=node_strengths[key])
+
     if cnt > 100:
         st.markdown(
-            """ Warning large number of collaborators {0} building network will take time ... """.format(
+            """ Detected large degree of collaborators/interconnectdness {0} building network will take time ... """.format(
                 cnt
             )
         )
 
     for title, mini_net in tqdm(
-        coauthors, title="Queried authors, now building network structure and rendering plots"
+        coauthors,
+        title="Queried authors, now building network structure and rendering plots",
     ):
         # build small worlds
         # from projection

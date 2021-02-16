@@ -1,3 +1,4 @@
+# https://gist.github.com/random-person-001/8a47a333be7185a22c0e43618a7d052c
 import numpy as np
 import plotly.graph_objs as go
 import colorlover as cl
@@ -266,7 +267,6 @@ def make_filled_chord(M):  # ,labels):
                     + "{0}".format(matrix[k][j])
                     + " of the "
                     + labels[j]
-                    + " appearences"
                 )
                 textf = (
                     labels[j]
@@ -274,7 +274,6 @@ def make_filled_chord(M):  # ,labels):
                     + "{0}".format(matrix[j][k])
                     + " of the "
                     + labels[k]
-                    + " appearences"
                 )
 
                 ribbon_info.append(
