@@ -19,9 +19,12 @@ import shelve
 from auxillary_methods import push_frame_to_screen, plotly_sized, data_shade
 import chord2
 import shelve
-
+def disable_logo(plot, element):
+    plot.state.toolbar.logo = None
 hv.extension("bokeh", logo=False)
-hv.output(size=100)
+hv.output(size=200)
+hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
+
 author_list = [
     "Brian H Smith",
     "Christian Rabeling",
@@ -39,7 +42,7 @@ def main():
 
     # options = [150, 175, 200, 50, 75, 100, 125]
     # figure_size = st.sidebar.radio("Figure size (smaller-faster)", options)
-    figure_size = 150
+    figure_size = 200
     hv.output(size=figure_size)
 
     st.title("Create Coauthorship Network of Science Author")
@@ -69,7 +72,6 @@ def main():
             # if 'df' in db[author_name].keys():
             df = db[author_name]["df"]
             if "fig_pln" in db[author_name].keys():
-
                 fig_pln = db[author_name]["fig_pln"]
             if "g" in db[author_name].keys():
                 g = db[author_name]["g"]
@@ -99,14 +101,15 @@ def main():
             )
             graph.opts(
                 color_index="circle",
-                width=350,
-                height=350,
+                width=450,
+                height=450,
                 show_frame=False,
                 xaxis=None,
                 yaxis=None,
                 tools=["hover", "tap"],
                 node_size=10,
                 cmap=["blue", "orange"],
+                plot=dict(finalize_hooks=[disable_logo]),
             )
             edges_df = networkx.to_pandas_adjacency(g)
             fig = chord2.make_filled_chord(edges_df)
