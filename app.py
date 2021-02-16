@@ -50,7 +50,7 @@ def main():
 	if author_name1:
 		author_name = author_name1
 		author_name0 = None
-		#author_list.insert(0,author_name1)
+		author_list.insert(0,author_name1)
 
 	if author_name0:
 		author_name = author_name0
@@ -72,11 +72,11 @@ def main():
 			#	db[author_name] = {'chord':fig,'graph':graph,'df':df}
 
 		if not flag:
-			#@st.cache(suppress_st_warning=True)
-			#def wrapper(author_name):
-			#	g, df = author_to_coauthor_network(author_name)
-			#	return g,df
-			g, df = author_to_coauthor_network(author_name)
+			@st.cache(suppress_st_warning=True)
+			def wrapper(author_name):
+				g, df = author_to_coauthor_network(author_name)
+				return g,df
+			#g, df = author_to_coauthor_network(author_name)
 			#g,df = wrapper(author_name)
 			graph = hv.Graph.from_networkx(g, networkx.layout.fruchterman_reingold_layout)
 			graph.opts(
