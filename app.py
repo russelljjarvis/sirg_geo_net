@@ -109,8 +109,9 @@ def main():
                 tools=["hover", "tap"],
                 node_size=10,
                 cmap=["blue", "orange"],
-                plot=dict(finalize_hooks=[disable_logo]),
+
             )
+            #plot=dict(finalize_hooks=[disable_logo]),
             edges_df = networkx.to_pandas_adjacency(g)
             fig = chord2.make_filled_chord(edges_df)
             db[author_name] = {
