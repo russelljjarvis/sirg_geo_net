@@ -36,8 +36,9 @@ author_list = [
 def main():
 	MAIN_AUTHOR = "Brian H Smith"
 
-	options = [150, 175, 200, 50, 75, 100, 125]
-	figure_size = st.sidebar.radio("Figure size (smaller-faster)", options)
+	#options = [150, 175, 200, 50, 75, 100, 125]
+	#figure_size = st.sidebar.radio("Figure size (smaller-faster)", options)
+	figure_size = 150
 	hv.output(size=figure_size)
 
 	st.title("Create Coauthorship Network of Science Author")
@@ -48,7 +49,8 @@ def main():
 
 	if author_name1:
 		author_name = author_name1
-		author_list.insert(0,author_name1)
+		author_name0 = None
+		#author_list.insert(0,author_name1)
 
 	if author_name0:
 		author_name = author_name0
@@ -63,18 +65,19 @@ def main():
 		if flag:
 			fig = db[author_name]['chord']#:fig,'graph':graph}
 			graph = db[author_name]['graph']
-			if 'df' in db[author_name].keys():
-				df = db[author_name]['df']
-			else:
-				g, df = author_to_coauthor_network(author_name)
-				db[author_name] = {'chord':fig,'graph':graph,'df':df}
+			#if 'df' in db[author_name].keys():
+			df = db[author_name]['df']
+			#else:
+			#	g, df = author_to_coauthor_network(author_name)
+			#	db[author_name] = {'chord':fig,'graph':graph,'df':df}
 
 		if not flag:
-			@st.cache(suppress_st_warning=True)
-			def wrapper(author_name):
-				g, df = author_to_coauthor_network(author_name)
-				return g,df
-			g,df = wrapper(author_name)
+			#@st.cache(suppress_st_warning=True)
+			#def wrapper(author_name):
+			#	g, df = author_to_coauthor_network(author_name)
+			#	return g,df
+			g, df = author_to_coauthor_network(author_name)
+			#g,df = wrapper(author_name)
 			graph = hv.Graph.from_networkx(g, networkx.layout.fruchterman_reingold_layout)
 			graph.opts(
 				color_index="circle",
