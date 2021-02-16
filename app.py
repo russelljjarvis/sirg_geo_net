@@ -76,7 +76,7 @@ def main():
 			def wrapper(author_name):
 				g, df = author_to_coauthor_network(author_name)
 				return g,df
-			#g, df = author_to_coauthor_network(author_name)
+			g, df = author_to_coauthor_network(author_name)
 			#g,df = wrapper(author_name)
 			graph = hv.Graph.from_networkx(g, networkx.layout.fruchterman_reingold_layout)
 			graph.opts(
@@ -100,7 +100,7 @@ def main():
 		unsafe_allow_html=True,
 	)
 	st.write(fig)
-	st.markdown("""----""")
+	st.markdown("""--------------""")
 
 	label = "Coauthorship Network for: " + MAIN_AUTHOR
 	st.markdown(
@@ -108,9 +108,7 @@ def main():
 		unsafe_allow_html=True,
 	)
 	st.write(hv.render(graph, backend="bokeh"))
-
-	###
-	#if "df" in locals():
+	st.markdown("""--------------""")
 	st.markdown(
 			"<h3 style='text-align: left; color: black;'>"
 			+ str(

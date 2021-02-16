@@ -67,7 +67,7 @@ def network(coauthors, MAIN_AUTHOR):
         )
 
     for title, mini_net in tqdm(
-        coauthors, title="queried authors, now building network structure"
+        coauthors, title="Queried authors, now building network structure and rendering plots"
     ):
         # build small worlds
         # from projection
