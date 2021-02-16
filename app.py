@@ -68,7 +68,9 @@ def main():
             graph = db[author_name]["graph"]
             # if 'df' in db[author_name].keys():
             df = db[author_name]["df"]
-            fig_pln = db[author_name]["fig_pln"]
+            if "fig_pln" in db[author_name].keys():
+
+                fig_pln = db[author_name]["fig_pln"]
             if "g" in db[author_name].keys():
                 g = db[author_name]["g"]
 
