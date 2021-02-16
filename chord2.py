@@ -294,7 +294,8 @@ def make_filled_chord(M):#,labels):
 
     layout['paper_bgcolor']='rgba(0,0,0,0)'
     layout['plot_bgcolor']='rgba(0,0,0,0)'
-
+    layout['width']=500
+    layout['height']=500
     data = ideograms + ribbon_info
     fig = {
         "data": data,

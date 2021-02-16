@@ -69,7 +69,7 @@ def main():
 			del graph
 			del chord
 
-	label="Coauthorship Network for: "+MAIN_AUTHOR
+	label="### Coauthorship Network for: "+MAIN_AUTHOR
 	st.markdown(label)
 
 
@@ -90,7 +90,7 @@ def main():
  	#cmap = ['blue','orange'])
 	#chord.opts(color_index='circle', width=350, height=350, show_frame=False,
 	#				 xaxis=None, yaxis=None)#,label=label)
-	label="Coauthorship Chord Network for: "+MAIN_AUTHOR
+	label="### Coauthorship Chord Network for: "+MAIN_AUTHOR
 	st.markdown(label)
 
 	#st.write(hv.render(chord, backend='bokeh'))
