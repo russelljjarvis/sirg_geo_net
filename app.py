@@ -53,17 +53,17 @@ def main():
 
     # options = [150, 175, 200, 50, 75, 100, 125]
     # figure_size = st.sidebar.radio("Figure size (smaller-faster)", options)
-    figure_size = 125
+    figure_size = 200
     hv.output(size=figure_size)
 
-    st.title("Create Coauthorship Network of Science Author")
+    st.title("Create a Coauthorship Network")
     author_name1 = st.text_input("Enter Author Name:")
     #st.markdown(
     """
-    Search Powered by [dissmin](https://dissemin.readthedocs.io/en/latest/api.html)
+    Note: Search applies [dissmin](https://dissemin.readthedocs.io/en/latest/api.html) API backend
     """#.format(author_name)
     options = tuple(author_list)
-    author_name0 = st.sidebar.radio("Which SIRG author are you interested in?", options)
+    author_name0 = st.sidebar.radio("Which author are you interested in?", options)
 
     if author_name1:
         author_name = author_name1
