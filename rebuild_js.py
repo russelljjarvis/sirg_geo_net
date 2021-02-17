@@ -97,7 +97,24 @@ except:
 
 from auxillary_methods import data_shade
 import matplotlib.pyplot as plt
-fig = data_shade(mg)
+#fig = data_shade(mg)
+import crossref_commons.retrieval
+def author_to_affiliations(NAME):
+    response = requests.get("https://dissem.in/api/search/?authors=" + str(NAME))
+    author_papers = response.json()
+    visit_urls = []
+    coauthors = []
+    titles = []
+    affilations = {}
+    for p in author_papers["papers"]:
+        coauthors_ = p["authors"]
+        records = p["records"][0]
+        if "doi" in records.keys():
+            visit_urls.append(records["doi"])
+            doi_to_affil = crossref_commons.retrieval.get_publication_as_json(records["doi"])
+            key = stored['author'][0]['given']+stored['author'][0]['family']
+            affilations[key] = doi_to_affil['author'][0]['affiliation']
+    return affilations
 
 #print(exhaustive_author_list)
 #yes = set(exhaustive_author_list).intersection(existing_nodes)

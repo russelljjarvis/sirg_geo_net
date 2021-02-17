@@ -118,7 +118,7 @@ def plotly_sized(g):
     fig.update_yaxes(showticklabels=False)  # Show figure
     return fig
     # fig.show()
-
+'''
 def try_again(g):
     from holoviews.operation.datashader import datashade, bundle_graph
     import holoviews as hv
@@ -130,9 +130,6 @@ def try_again(g):
     #edges_df = pd.DataFrame(ds_edges_py, columns=["source", "target"])
     fb_nodes = hv.Nodes(g.nodes)#.sort()
     fb_graph = hv.Graph((g.edges, fb_nodes), label='Entire Sirg Network')
-    #bundled = bundle_graph(fb_graph)
-    #bundled
-    print(fb_graph)
     return fb_graph
     #
 
@@ -172,10 +169,6 @@ def data_shade(graph):
         coords.append((x, y))
     nodes_py = [[name, pos[0], pos[1]] for name, pos in zip(nodes, coords)]
     ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
-    #print(graph.edges)
-    #import pdb
-    #pdb.set_trace()
-    #ds_edges_py = [[int(n0), int(n1)] for (n0, n1) in graph.edges]
 
     ds_edges_py = [
         [n0, n1] for (n0, n1) in graph.edges
@@ -186,7 +179,7 @@ def data_shade(graph):
     hb = hammer_bundle(ds_nodes, ds_edges)
     fig = hb.plot(x="x", y="y", figsize=(9, 9))
     return fig
-
+'''
 
 def university_data_frame():
 
@@ -300,8 +293,6 @@ def author_to_coauthor_network(name: str = "") -> networkx.DiGraph():
         pickle.dump(df, f)
 
     g = network(coauthors, name)
-    # with open(str(name)+".p","wb") as f:
-    # 	pickle.dump(g,f)
     return g, df
 
 

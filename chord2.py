@@ -243,8 +243,7 @@ def make_filled_chord(M):  # ,labels):
                 text = (
                     labels[k]
                     + " co-occurs with "
-                    + "{:d}".format(M.iloc[k, k])
-                    + " of its own appearences"
+                    + "{0}".format(M.iloc[k, k])
                 )
                 ribbon_info.append(
                     go.Scatter(
