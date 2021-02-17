@@ -8,21 +8,29 @@ import os
 import pandas as pd
 import pickle
 import streamlit as st
-
+#from auxillary_methods import ego_graph
 from holoviews import opts, dim
 from collections import Iterable
 import networkx
 
-from auxillary_methods import author_to_coauthor_network, network
+from auxillary_methods import author_to_coauthor_network, network#,try_again
 import holoviews as hv
-import shelve
-from auxillary_methods import push_frame_to_screen, plotly_sized, data_shade
+from auxillary_methods import push_frame_to_screen, plotly_sized#, data_shade, draw_wstate_tree
 import chord2
 import shelve
+
+
+# from flask import render_template
+# def map_func():
+# 	return render_template('geo_coding.html',apikey=api_key,latitude=latitude,longitude=longitude)#map.html is my HTML file name
+
+
 def disable_logo(plot, element):
     plot.state.toolbar.logo = None
+
+
 hv.extension("bokeh", logo=False)
-hv.output(size=200)
+hv.output(size=300)
 hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
 
 author_list = [
@@ -38,23 +46,27 @@ author_list = [
 
 
 def main():
+
     MAIN_AUTHOR = "Brian H Smith"
 
     # options = [150, 175, 200, 50, 75, 100, 125]
     # figure_size = st.sidebar.radio("Figure size (smaller-faster)", options)
-    figure_size = 200
+    figure_size = 125
     hv.output(size=figure_size)
 
     st.title("Create Coauthorship Network of Science Author")
     author_name1 = st.text_input("Enter Author Name:")
-
+    #st.markdown(
+    """
+    Search Powered by [dissmin](https://dissemin.readthedocs.io/en/latest/api.html)
+    """#.format(author_name)
     options = tuple(author_list)
     author_name0 = st.sidebar.radio("Which SIRG author are you interested in?", options)
 
     if author_name1:
         author_name = author_name1
         author_name0 = None
-        author_list.insert(0, author_name1)
+        #author_list.insert(0, author_name1)
 
     if author_name0:
         author_name = author_name0
@@ -109,9 +121,8 @@ def main():
                 tools=["hover", "tap"],
                 node_size=10,
                 cmap=["blue", "orange"],
-
             )
-            #plot=dict(finalize_hooks=[disable_logo]),
+            # plot=dict(finalize_hooks=[disable_logo]),
             edges_df = networkx.to_pandas_adjacency(g)
             fig = chord2.make_filled_chord(edges_df)
             db[author_name] = {
@@ -138,33 +149,58 @@ def main():
     )
     st.write(hv.render(graph, backend="bokeh"))
     st.markdown("""--------------""")
-    st.markdown(
-        "<h3 style='text-align: left; color: black;'>"
-        + str("Here are some of the publications we are using to build the networks.")
-        + "</h3>",
-        unsafe_allow_html=True,
-    )
-    push_frame_to_screen(df)
-    with shelve.open("fast_graphs_splash.p") as db:
-        flag = author_name in db
-        if flag:
-            try:
-                fig_pln = plotly_sized(db[author_name]["fig_pln"])
-            except:
-                g, df = author_to_coauthor_network(author_name)
-                fig_pln = plotly_sized(g)
-            db[author_name]["g"] = g
-            db[author_name]["fig_pln"] = fig_pln
-    st.markdown("""--------------""")
-    st.markdown(
-        "<h3 style='text-align: left; color: black;'>"
-        + str("Experimental Graph:")
-        + "</h3>",
-        unsafe_allow_html=True,
-    )
-    # st.write(fig_shade)
-    st.write(fig_pln)
+    #st.markdown(
+    #    "<h3 style='text-align: left; color: black;'>"
+    #    + str("Here are some of the publications we are using to build the networks.")
+    #    + "</h3>",
+    #    unsafe_allow_html=True,
+    #)
+    #push_frame_to_screen(df)
 
+    def passed():
+        with shelve.open("fast_graphs_splash.p") as db:
+            flag = author_name in db
+            if flag:
+                try:
+                    fig_pln = plotly_sized(db[author_name]["fig_pln"])
+                except:
+                    g, df = author_to_coauthor_network(author_name)
+                    fig_pln = plotly_sized(g)
+                db[author_name]["g"] = g
+                db[author_name]["fig_pln"] = fig_pln
+        st.markdown("""--------------""")
+        st.markdown(
+            "<h3 style='text-align: left; color: black;'>"
+            + str("Experimental Graph:")
+            + "</h3>",
+            unsafe_allow_html=True,
+        )
+        # st.write(fig_shade)
+        st.write(fig_pln)
+
+
+
+    #st.markdown("""## Graphs of Entire SIRG network """)#.format(author_name))
+    #st.markdown(""" This will take a long time """)#.format(author_name))
+
+
+    #ego_graph(mg)
+    #fb_graph = try_again(mg)
+    #fig_pln = plotly_sized(mg)
+    #st.write(hv.render(fb_graph, backend="bokeh"))
+    #edges_df_full = networkx.to_pandas_adjacency(mg)
+    #st.markdown("""## ----------------- """)#.format(author_name))
+
+    #fig = chord2.make_filled_chord(edges_df_full)
+    #st.write(fig)
+    #st.markdown("""## ----------------- """)#.format(author_name))
+    #try:
+    #    from PIL import Image
+    #    image = Image.open("whole_net_not_dot_huge.png")
+    #    st.image(image, caption='Whole SIRG Network',
+    #            use_column_width=True)
+    #except:
+    #    pass
 
 if __name__ == "__main__":
     main()

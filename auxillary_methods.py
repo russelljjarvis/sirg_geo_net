@@ -1,3 +1,4 @@
+import matplotlib
 from typing import Any, Dict, List, Optional, Tuple, Type, Union, Text
 import requests
 from tqdm import tqdm
@@ -10,10 +11,25 @@ import pickle
 import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
-from datashader.bundling import hammer_bundle
+#from datashader.bundling import hammer_bundle
+import matplotlib.pyplot as plt
+import networkx as nx
 
 import numpy as np
 
+def draw_wstate_tree(G):
+
+    #from networkx.drawing.nx_agraph import write_dot, graphviz_layout
+    pos = nx.spring_layout(G)
+    #pos = graphviz_layout(G, prog='dot')
+    edge_labels = nx.get_edge_attributes(G, 'label')
+    nx.draw(G, pos)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8)
+    nx.draw_networkx_labels(G, pos, font_size=10)
+    matplotlib.use('Agg')
+
+    plt.savefig("whole_net.png")
+    st.write(plt.show())
 # Custom function to create an edge between node x and node y, with a given text and width
 def make_edge(x, y, text, width):
     return go.Scatter(
@@ -103,6 +119,45 @@ def plotly_sized(g):
     return fig
     # fig.show()
 
+def try_again(g):
+    from holoviews.operation.datashader import datashade, bundle_graph
+    import holoviews as hv
+
+    #edges_df = g.edges#pd.read_csv('../assets/fb_edges.csv')
+    ds_edges_py = [
+        [n0, n1] for (n0, n1) in g.edges
+    ]
+    #edges_df = pd.DataFrame(ds_edges_py, columns=["source", "target"])
+    fb_nodes = hv.Nodes(g.nodes)#.sort()
+    fb_graph = hv.Graph((g.edges, fb_nodes), label='Entire Sirg Network')
+    #bundled = bundle_graph(fb_graph)
+    #bundled
+    print(fb_graph)
+    return fb_graph
+    #
+
+def ego_graph(g):
+    # https://hvplot.holoviz.org/user_guide/NetworkX.html
+    #import holoviews.networkx as hvnx
+    from operator import itemgetter
+    import holoviews as hv
+    # Create a BA model graph
+    #n = 1000
+    #m = 2
+    #G = nx.generators.barabasi_albert_graph(n, m)
+    # find node with largest degree
+    node_and_degree = g.degree()
+    (largest_hub, degree) = sorted(node_and_degree, key=itemgetter(1))[-1]
+    # Create ego graph of main hub
+    hub_ego = nx.ego_graph(g, largest_hub)
+    # Draw graph
+    pos = nx.spring_layout(hub_ego)
+    g = nx.draw(hub_ego, pos, node_color='blue', node_size=50, with_labels=False)
+    # Draw ego as large and red
+    #gnodes = nx.draw_networkx_nodes(hub_ego, pos, nodelist=[largest_hub], node_size=300, node_color='red')
+    #result = g * gnodes
+    st.write(hv.render(result, backend="bokeh"))
+    return result
 
 def data_shade(graph):
     # from sklearn.decomposition import PCA
@@ -116,11 +171,17 @@ def data_shade(graph):
         x, y = pos_[node]
         coords.append((x, y))
     nodes_py = [[name, pos[0], pos[1]] for name, pos in zip(nodes, coords)]
-    print(nodes_py)
     ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
+    #print(graph.edges)
+    #import pdb
+    #pdb.set_trace()
+    #ds_edges_py = [[int(n0), int(n1)] for (n0, n1) in graph.edges]
+
     ds_edges_py = [
-        [int(n0.split("_")[1]), int(n1.split("_")[1])] for (n0, n1) in graph.edges
+        [n0, n1] for (n0, n1) in graph.edges
     ]
+
+
     ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
     hb = hammer_bundle(ds_nodes, ds_edges)
     fig = hb.plot(x="x", y="y", figsize=(9, 9))

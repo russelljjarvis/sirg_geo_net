@@ -13,8 +13,9 @@ networkx
 pyviz
 holoviews
 bokeh
-#xarray
-#datashader
+js2py
+xarray
+datashader
 pandapower
 #seaborn
 #regex
