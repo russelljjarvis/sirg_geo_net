@@ -42,6 +42,7 @@ author_list = [
     "Jennifer H Fewell",
     "Arianne J Cease",
     "Gro V Amdam",
+    "Antonin Delpeuch"
 ]
 
 
@@ -148,14 +149,15 @@ def main():
         unsafe_allow_html=True,
     )
     st.write(hv.render(graph, backend="bokeh"))
-    st.markdown("""--------------""")
-    #st.markdown(
-    #    "<h3 style='text-align: left; color: black;'>"
-    #    + str("Here are some of the publications we are using to build the networks.")
-    #    + "</h3>",
-    #    unsafe_allow_html=True,
-    #)
-    #push_frame_to_screen(df)
+    st.markdown("""#--------------""")
+    st.markdown(
+        "<h3 style='text-align: left; color: black;'>"
+        + str("Here are some of the publications dissmin used to build these networks.")
+        + "</h3>",
+        unsafe_allow_html=True,
+    )
+    push_frame_to_screen(df.head())
+    #push_frame_to_screen(df.head())
 
     def passed():
         with shelve.open("fast_graphs_splash.p") as db:
