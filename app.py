@@ -34,6 +34,7 @@ hv.output(size=300)
 hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
 
 author_list = [
+    "Antonin Delpeuch",
     "Brian H Smith",
     "Christian Rabeling",
     "Jon F Harrison",
@@ -41,14 +42,14 @@ author_list = [
     "Stephen C Pratt",
     "Jennifer H Fewell",
     "Arianne J Cease",
-    "Gro V Amdam",
-    "Antonin Delpeuch"
+    "Gro V Amdam"
 ]
 
 
 def main():
 
-    MAIN_AUTHOR = "Brian H Smith"
+    MAIN_AUTHOR = "Antonin Delpeuch"
+    #"Brian H Smith"
 
     # options = [150, 175, 200, 50, 75, 100, 125]
     # figure_size = st.sidebar.radio("Figure size (smaller-faster)", options)
@@ -149,7 +150,7 @@ def main():
         unsafe_allow_html=True,
     )
     st.write(hv.render(graph, backend="bokeh"))
-    st.markdown("""#--------------""")
+    st.markdown("""--------------""")
     st.markdown(
         "<h3 style='text-align: left; color: black;'>"
         + str("Here are some of the publications dissmin used to build these networks.")
