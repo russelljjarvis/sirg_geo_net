@@ -18,7 +18,7 @@ wget https://ftp.mozilla.org/pub/firefox/releases/45.0.2/linux-x86_64/en-GB/fire
 mkdir -p ~/.streamlit/
 echo "\
 [general]\n\
-email = \"rjjarvis@asu.edu\"\n\
+email = \"russelljarvis@protonmail.com\"\n\
 " > ~/.streamlit/credentials.toml
 echo "\
 [server]\n\
