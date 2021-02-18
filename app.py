@@ -181,7 +181,7 @@ def main():
         # st.write(fig_shade)
         st.write(fig_pln)
 
-
+    st.markdown("""[My other science information dashboard app](https://agile-reaches-20338.herokuapp.com/)""")
 
     #st.markdown("""## Graphs of Entire SIRG network """)#.format(author_name))
     #st.markdown(""" This will take a long time """)#.format(author_name))
