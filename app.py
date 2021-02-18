@@ -157,7 +157,7 @@ def main():
         + "</h3>",
         unsafe_allow_html=True,
     )
-    push_frame_to_screen(df.head())
+    push_frame_to_screen(df)
     #push_frame_to_screen(df.head())
 
     def passed():
