@@ -26,3 +26,5 @@ headless = true\n\
 enableCORS=false\n\
 port = $PORT\n\
 " > ~/.streamlit/config.toml
+wget https://www.dropbox.com/sh/x1ea0gt5cenqcfi/AADPGs-xD2A5WhNV2WIgKS_Wa?dl=0
+mv AADPGs-xD2A5WhNV2WIgKS_Wa?dl=0 AADPGs-xD2A5WhNV2WIgKS_Wa?dl
