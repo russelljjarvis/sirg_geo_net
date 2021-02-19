@@ -3,6 +3,10 @@ from auxillary_methods import author_to_coauthor_network, network
 import networkx as nx
 import pickle
 
+from auxillary_methods import data_shade
+import matplotlib.pyplot as plt
+#fig = data_shade(mg)
+import crossref_commons.retrieval
 #affiliation_id_dict={'affiliation':afil,'id':Author_name}
 #js_data_contents['data/js/authorGraph.js'] =
 
@@ -64,11 +68,9 @@ def update_data_sources():
 				with open('old_pickle.p','rb') as f:
 					old_pickle = pickle.dump(f)
 				g = old_pickle[k]
-				#g, df = author_to_coauthor_network(k)
 				nl = g.nodes
 				exhaustive_author_list.extend(list(nl))
 				db[k]['g'] = g
-				#old_pickle[k] = g
 			to_mega_net.append(g)
 		db.close()
 		for i,mn in enumerate(to_mega_net):
@@ -95,10 +97,6 @@ except:
 #	from grab_js import *
 #	existing_nodes = [i['id'] for i in js_data_contents['authorGraph.js']['nodes'] ]
 
-from auxillary_methods import data_shade
-import matplotlib.pyplot as plt
-#fig = data_shade(mg)
-import crossref_commons.retrieval
 def author_to_affiliations(NAME):
     response = requests.get("https://dissem.in/api/search/?authors=" + str(NAME))
     author_papers = response.json()

@@ -5,6 +5,7 @@ import glob
 import requests
 from flask import render_template
 import json
+from geopy.geocoders import Nominatim
 
 #results = js2py.run_file("data/affiliationList.js")
 #affil_dict = results[0].to_dict()
@@ -56,6 +57,14 @@ def coords_of_target_university(search_key):
 	for k,v in py_geo_map.items():
 		if search_key in k:
 			return (k,v)
+		else:
+
+			geolocator = Nominatim(user_agent="SIRG")
+			location = geolocator.geocode("Arizona State University")
+			v = (location.latitude,location.longitude)
+			print(search_key,v)
+			return (search_key, v)
+
 		#else:
 		#    if k in search_key:
 		#        return (k,v)
