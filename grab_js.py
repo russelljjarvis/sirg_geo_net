@@ -61,10 +61,13 @@ def coords_of_target_university(search_key):
 		else:
 
 			geolocator = Nominatim(user_agent="SIRG")
-			location = geolocator.geocode("Arizona State University")
-			v = (location.latitude,location.longitude)
-			print(search_key,v)
-			return (search_key, v)
+			location = geolocator.geocode(search_key)
+			if location is not None:
+				v = (location.latitude,location.longitude)
+				print(search_key,v)
+				return (search_key, v)
+			else:
+				print(None,search_key)
 
 		#else:
 		#    if k in search_key:

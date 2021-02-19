@@ -101,7 +101,10 @@ except:
 def author_to_affiliations(NAME):
 	try:
 		with open('affilations.p','rb') as f:
-			affiliations = pickle.dump(f)
+			affiliations = pickle.load(f)
+		for k,v in affiliations.items():
+			if type(v) is type(list()):
+				affiliations[k] = v[0]['name']
 	except:
 		pass
 
@@ -122,18 +125,21 @@ def author_to_affiliations(NAME):
 				key = al['given']+str(" ")+al['family']
 				#if key not in affiliations.keys():
 				if len(al['affiliation']):
-					affiliations[key] = al['affiliation']
+					affiliations[key] = al['affiliation'][0]['name']
 				if "ORCID" in al.keys():
 					orcids[key] = al["ORCID"]
-				if not len(al['affiliation']):
-					search_query = list(scholarly.search_author(key))
-					#sq = search_query[0]
-					if len(search_query):
-						sq = search_query[0]
-						res_author_search = scholarly.fill(sq)
-						afil = res_author_search['affiliation']
-						#if "university" in afil or "state" in afil or "universidad" in afil or "college" in afil or "school" in afil:
-						affiliations[key] = res_author_search['affiliation']
+				#if not len(al['affiliation']):
+				search_query = list(scholarly.search_author(key))
+				#sq = search_query[0]
+				if len(search_query):
+					sq = search_query[0]
+					res_author_search = scholarly.fill(sq)
+					afil = res_author_search['affiliation']
+					#if "university" in afil or "state" in afil or "universidad" in afil or "college" in afil or "school" in afil:
+					if len(al['affiliation']):
+						#if al['affiliation'] in res_author_search['affiliation']:
+						print(al['affiliation'],res_author_search['affiliation'])
+					affiliations[key] = res_author_search['affiliation']
 							#print(affiliations[key],key)
 							#print(affiliations)
 
@@ -141,9 +147,41 @@ def author_to_affiliations(NAME):
 		pickle.dump(affiliations,f)
 	return affiliations
 print([name for name in mg.nodes])
-for name in mg.nodes:
-	print(name)
-	affils = author_to_affiliations(name)
+#for name in mg.nodes:
+#	print(name)
+#	affils = author_to_affiliations(name)
+
+with open('affilations.p','rb') as f:
+	affiliations = pickle.load(f)
+for k,v in affiliations.items():
+	if type(v) is type(list()):
+		affiliations[k] = v[0]['name']
+with open('affilations.p','wb') as f:
+	pickle.dump(affiliations,f)
+
+from grab_js import coords_of_target_university, university_data_frame
+
+university_locations = {}
+for k,v in affiliations.items():
+	#if type(v) is type(list()):
+	#affiliations[k]# = v[0]['name']
+	print(k,v)
+
+print(len(mg.nodes))
+df,b = university_data_frame()
+for ind,(count,univ) in enumerate(zip(df["country"], df["university"])):
+
+	#import pdb
+	#pdb.set_trace()
+	#university_locations[k] = coords_of_target_university(univ[ind])
+	print(univ[ind])
+	returned = coords_of_target_university(univ[ind])
+	if returned is not None:
+		university_locations[univ[ind]] = returned
+	if univ[ind] in university_locations.keys():
+		print(university_locations[univ[ind]])
+	#print(university_locations)
+#print(university_locations)
 #print(exhaustive_author_list)
 #yes = set(exhaustive_author_list).intersection(existing_nodes)
 #print(yes)
