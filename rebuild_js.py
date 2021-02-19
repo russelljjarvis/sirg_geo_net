@@ -2,9 +2,11 @@ import shelve
 from auxillary_methods import author_to_coauthor_network, network
 import networkx as nx
 import pickle
-
-from auxillary_methods import data_shade
+import requests
+#from auxillary_methods import data_shade
 import matplotlib.pyplot as plt
+from scholarly import scholarly
+
 #fig = data_shade(mg)
 import crossref_commons.retrieval
 #affiliation_id_dict={'affiliation':afil,'id':Author_name}
@@ -18,14 +20,14 @@ import crossref_commons.retrieval
 #	js_data_contents['authorGraph.js']['nodes'].append({'affiliation':v[0],'id':k})
 
 author_list = [
-    "Brian H Smith",
-    "Christian Rabeling",
-    "Jon F Harrison",
-    "Juergen Liebig",
-    "Stephen C Pratt",
-    "Jennifer H Fewell",
-    "Arianne J Cease",
-    "Gro V Amdam",
+	"Brian H Smith",
+	"Christian Rabeling",
+	"Jon F Harrison",
+	"Juergen Liebig",
+	"Stephen C Pratt",
+	"Jennifer H Fewell",
+	"Arianne J Cease",
+	"Gro V Amdam",
 ]
 def update_data_sources():
 	with shelve.open("fast_graphs_splash.p") as db:
@@ -65,8 +67,8 @@ def update_data_sources():
 				nl = v['g'].nodes
 				exhaustive_author_list.extend(list(nl))
 			except:
-				with open('old_pickle.p','rb') as f:
-					old_pickle = pickle.dump(f)
+				with open('data/old_pickle.p','rb') as f:
+					old_pickle = pickle.load(f)
 				g = old_pickle[k]
 				nl = g.nodes
 				exhaustive_author_list.extend(list(nl))
@@ -96,24 +98,52 @@ except:
 #if 'existing_nodes' not in locals():
 #	from grab_js import *
 #	existing_nodes = [i['id'] for i in js_data_contents['authorGraph.js']['nodes'] ]
-
 def author_to_affiliations(NAME):
-    response = requests.get("https://dissem.in/api/search/?authors=" + str(NAME))
-    author_papers = response.json()
-    visit_urls = []
-    coauthors = []
-    titles = []
-    affilations = {}
-    for p in author_papers["papers"]:
-        coauthors_ = p["authors"]
-        records = p["records"][0]
-        if "doi" in records.keys():
-            visit_urls.append(records["doi"])
-            doi_to_affil = crossref_commons.retrieval.get_publication_as_json(records["doi"])
-            key = stored['author'][0]['given']+stored['author'][0]['family']
-            affilations[key] = doi_to_affil['author'][0]['affiliation']
-    return affilations
+	try:
+		with open('affilations.p','rb') as f:
+			affiliations = pickle.dump(f)
+	except:
+		pass
 
+	response = requests.get("https://dissem.in/api/search/?authors=" + str(NAME))
+	author_papers = response.json()
+	visit_urls = []
+	coauthors = []
+	titles = []
+	affiliations = {}
+	orcids = {}
+	for p in author_papers["papers"]:
+		coauthors_ = p["authors"]
+		records = p["records"][0]
+		if "doi" in records.keys():
+			visit_urls.append(records["doi"])
+			doi_to_author_affil_list = crossref_commons.retrieval.get_publication_as_json(records["doi"])
+			for al in doi_to_author_affil_list["author"]:
+				key = al['given']+str(" ")+al['family']
+				#if key not in affiliations.keys():
+				if len(al['affiliation']):
+					affiliations[key] = al['affiliation']
+				if "ORCID" in al.keys():
+					orcids[key] = al["ORCID"]
+				if not len(al['affiliation']):
+					search_query = list(scholarly.search_author(key))
+					#sq = search_query[0]
+					if len(search_query):
+						sq = search_query[0]
+						res_author_search = scholarly.fill(sq)
+						afil = res_author_search['affiliation']
+						#if "university" in afil or "state" in afil or "universidad" in afil or "college" in afil or "school" in afil:
+						affiliations[key] = res_author_search['affiliation']
+							#print(affiliations[key],key)
+							#print(affiliations)
+
+	with open('affilations.p','wb') as f:
+		pickle.dump(affiliations,f)
+	return affiliations
+print([name for name in mg.nodes])
+for name in mg.nodes:
+	print(name)
+	affils = author_to_affiliations(name)
 #print(exhaustive_author_list)
 #yes = set(exhaustive_author_list).intersection(existing_nodes)
 #print(yes)
