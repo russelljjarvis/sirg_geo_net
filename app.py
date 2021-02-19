@@ -59,17 +59,15 @@ def main():
 
     st.title("Create a Coauthorship Network")
     author_name1 = st.text_input("Enter Author Name:")
-    #st.markdown(
     """
     Note: Search applies [dissmin](https://dissemin.readthedocs.io/en/latest/api.html) API backend
-    """#.format(author_name)
+    """
     options = tuple(author_list)
     author_name0 = st.sidebar.radio("Which author are you interested in?", options)
 
     if author_name1:
         author_name = author_name1
         author_name0 = None
-        #author_list.insert(0, author_name1)
 
     if author_name0:
         author_name = author_name0
@@ -82,9 +80,8 @@ def main():
     with shelve.open("fast_graphs_splash.p") as db:
         flag = author_name in db
         if flag:
-            fig = db[author_name]["chord"]  #:fig,'graph':graph}
+            fig = db[author_name]["chord"]
             graph = db[author_name]["graph"]
-            # if 'df' in db[author_name].keys():
             df = db[author_name]["df"]
             if "fig_pln" in db[author_name].keys():
                 fig_pln = db[author_name]["fig_pln"]
@@ -135,6 +132,9 @@ def main():
                 "fig_pln": fig_pln,
                 "g": g,
             }
+        if len(db.keys())>20:
+            for k in db.keys():
+                db.pop(k,None)
         db.close()
 
     label = "Coauthorship Chord Network for: " + MAIN_AUTHOR
