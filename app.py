@@ -212,14 +212,14 @@ def main():
     st.write(hv.render(graph, backend="bokeh"))
 
     # st.markdown("""Geo Geographic Maps computing now, this will take time""")
-    st.markdown(
-        "<h1 style='text-align: left; color: black;'>"
-        + str(
-            "Geographic Maps for whole sirg network computing now, this will take time"
-        )
-        + "</h1>",
-        unsafe_allow_html=True,
-    )
+    #st.markdown(
+    #    "<h1 style='text-align: left; color: black;'>"
+    #    + str(
+    #        "Geographic Maps for whole sirg network computing now, this will take time"
+    #    )
+    #    + "</h1>",
+    #    unsafe_allow_html=True,
+    #)
     st.markdown("""geo plots computing...""")
 
 

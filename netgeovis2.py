@@ -438,11 +438,11 @@ def data_bundle_plotly(
     traces = []
     other_traces = []
     st.markdown(
-        """Note only 250 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
+        """Note only 150 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
             len(segments)
         )
     )
-    for ind, seg in enumerate(tqdm(segments[::250], title="Bundling Edges")):
+    for ind, seg in enumerate(tqdm(segments[::150], title="Bundling Edges")):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
