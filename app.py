@@ -133,7 +133,7 @@ def big_plot_job():
 
 def main():
 	st.markdown("""--------------""")
-	st.title("""Geo Geographic Maps are hard to compute, so first we will populate the screen""")
+	st.title("""Geo Geographic Maps are time intensive to compute, so first we will populate the screen while you wait""")
 	st.markdown("""...with other stuff while we build them...""")
 
 
