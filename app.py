@@ -140,7 +140,7 @@ def main():
 
 	figure_size = 200
 	hv.output(size=figure_size)
-	author_name = sirg_author_list[0]
+	MAIN_AUTHOR = author_name = sirg_author_list[0]
 	with shelve.open("fast_graphs_splash.p") as db:
 		flag = author_name in db
 		#if False:
