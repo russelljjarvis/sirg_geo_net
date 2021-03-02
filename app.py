@@ -278,38 +278,6 @@ def main():
 	[Source Code:](https://github.com/russelljjarvis/CoauthorNetVis)
 	"""
 
-    # st.markdown("""## Graphs of Entire SIRG network """)#.format(author_name))
-    # st.markdown(""" This will take a long time """)#.format(author_name))
-
-    # ego_graph(mg)
-    # fb_graph = try_again(mg)
-    # fig_pln = plotly_sized(mg)
-    # st.write(hv.render(fb_graph, backend="bokeh"))
-    # edges_df_full = networkx.to_pandas_adjacency(mg)
-    # st.markdown("""## ----------------- """)#.format(author_name))
-
-    # fig = chord2.make_filled_chord(edges_df_full)
-    # st.write(fig)
-    # st.markdown("""## ----------------- """)#.format(author_name))
-    # try:
-    #    from PIL import Image
-    #    image = Image.open("whole_net_not_dot_huge.png")
-    #    st.image(image, caption='Whole SIRG Network',
-    #            use_column_width=True)
-    # except:
-    #    pass
-
 
 if __name__ == "__main__":
     main()
-    # from multiapp import MultiApp
-    # from apps import home, data_stats # import your app modules here
-
-    # app = MultiApp()
-
-    # Add all your application here
-    # app.add_app("Home", home.app)
-    # app.add_app("Data Stats", data_stats.app)
-
-    # The main app
-    # app.run()

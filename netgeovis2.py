@@ -619,6 +619,8 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     )
     with open("missing_person_name.p", "rb") as f:
         missing_person_name = pickle.load(f)
+
+    missing_person_name = [name for name in missing_person_name if name is not in str("Brian Smith")]
     ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
     st.dataframe(ds_nodes)
     st.markdown("""Okay now making an interactive version of this plot ...""")
