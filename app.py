@@ -233,15 +233,15 @@ def main():
         + "</h1>",
         unsafe_allow_html=True,
     )
-
+    st.markdown("""geo plots computing...""")
     big_plot_job()
 
     #st.markdown(
     #    """[My other science information dashboard app](https://agile-reaches-20338.herokuapp.com/)"""
     #)
-    """
-	[Source Code:](https://github.com/russelljjarvis/CoauthorNetVis)
-	"""
+    #"""
+	#[Source Code:](https://github.com/russelljjarvis/CoauthorNetVis)
+	#"""
 
 
 if __name__ == "__main__":
