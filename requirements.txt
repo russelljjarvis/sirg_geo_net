@@ -21,7 +21,7 @@ js2py
 xarray
 datashader
 pandapower
-#seaborn
+seaborn
 #regex
 #twython
 chart_studio
