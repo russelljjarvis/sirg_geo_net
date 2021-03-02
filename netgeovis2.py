@@ -123,9 +123,9 @@ def identify_find_missing():
 
         retry = {k: v for k, v in retry.items() if v[1] is not None}
         both_sets_locations_complete.update(retry)
-        list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
-        df = pd.DataFrame(list_of_dicts)
-        st.dataframe(df)
+        #list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+        #df = pd.DataFrame(list_of_dicts)
+        #st.dataframe(df)
         import copy
 
         with open("retry.p", "wb") as f:
@@ -477,6 +477,9 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
         )
     )
     fig.add_traces(other_traces)
+
+    layout["width"] = 625
+    layout["height"] = 625
     st.write(fig)
     return fig
 

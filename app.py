@@ -161,7 +161,6 @@ def big_plot_job():
     #both_sets_locations
     #both_sets_locations.keys()
 
-
     node_positions = list(both_sets_locations.values())
     long_lat = [np[1] for np in node_positions if np[1] is not None]
     lat = [coord[0] for coord in long_lat]
@@ -181,9 +180,11 @@ def big_plot_job():
 
         except:
             pass
-    plt_unbundled, plt_bundled, ax3 = (
+    plt_unbundled, plt_bundled, ax3 = main_plot_routine(
         both_sets_locations, missing_person_name, node_location_name
-    )  # ,author_list)
+    )
+    #main_plot_routine(both_sets_locations, missing_person_name, node_location_name)
+
 
 
 def main():
