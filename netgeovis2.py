@@ -100,19 +100,21 @@ def identify_find_missing():
 			if xy is None:
 				search = both_sets_locations_missing[person_key][0].split(' ')#[-2:-1]
 				xy = coords_of_target_university(search[-2]+str(' ')+search[-1])
-				check_none = xy[1]
-				retry[person_key] = xy
+				if xy is not None:
+					#check_none = xy[1]
+					retry[person_key] = xy
 			else:
 				retry[person_key] = xy
 				check_none = xy[1]
 		assert retry is not None
-		print(type(retry),retry)
+		#print(type(retry),retry)
 		import pprint
 		pprint.pprint(retry)
-		both_sets_locations_complete.update(retry)
 
 		#set(retry.keys()) -set(both_sets_locations_complete.keys());
 		retry = {k:v for k,v in retry.items() if v[1] is not None}
+		both_sets_locations_complete.update(retry)
+
 		import copy
 		with open('retry.p','wb') as f:
 			retry = pickle.dump(copy.copy(retry),f)
