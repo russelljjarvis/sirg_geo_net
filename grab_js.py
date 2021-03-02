@@ -4,7 +4,7 @@ import pandas as pd
 import pickle
 import glob
 import requests
-from flask import render_template
+#from flask import render_template
 import json
 import geopy
 geopy.geocoders.options.default_user_agent = 'my_app/1'
@@ -24,7 +24,7 @@ from geopy.geocoders import Nominatim
 #affil_dict = results[0].to_dict()
 
 
-
+'''
 jsdatafiles = [f for f in glob.glob("data/js/*.js")]
 js_data_contents = {}
 for f in jsdatafiles:
@@ -49,7 +49,7 @@ for k,v in holding.items():
 	key = v['Name']
 	value = v['Position']
 	existing_uni_coords[key] = value
-
+'''
 def university_data_frame():
 	wu = pd.read_csv("data/world-universities.csv")
 	wu.rename(
