@@ -157,6 +157,11 @@ def big_plot_job():
         with open("missing_person.p", "wb") as f:
             pickle.dump(temp, f)
 
+
+    #both_sets_locations
+    #both_sets_locations.keys()
+
+
     node_positions = list(both_sets_locations.values())
     long_lat = [np[1] for np in node_positions if np[1] is not None]
     lat = [coord[0] for coord in long_lat]
@@ -187,10 +192,11 @@ def main():
         """Geo Geographic Maps for whole SIRG network are time intensive to compute, so first we will populate the screen while you wait"""
     )
     st.markdown("""...with other stuff while we build them...""")
-
+    #identify_find_missing()
     figure_size = 200
     hv.output(size=figure_size)
-    MAIN_AUTHOR = author_name = sirg_author_list[0]
+
+    #MAIN_AUTHOR = author_name = sirg_author_list[0]
     #g, df = author_to_coauthor_network(author_name)
     #fig_pln = plotly_sized(g)
     with open("mega_net.p", "rb") as f:
@@ -210,14 +216,21 @@ def main():
         node_size=10,
         cmap=["blue", "orange"],
     )
+    if os.path.exists("missing_person.p"):
+        with open("missing_person.p", "rb") as f:
+            temp = pickle.load(f)
+        [
+            mg,
+            both_sets_locations,
+            missing_person_name,
+            missing_person_location,
+            both_sets_locations_missing,
+            sirg_author_list,
+        ] = temp
 
-    #label = "Coauthorship Chord Network for Whole SIRG network: "
-    #st.markdown(
-    #    "<h3 style='text-align: left; color: black;'>" + label + "</h3>",
-    #    unsafe_allow_html=True,
-    #)
-    #st.write(fig)
-    #st.markdown("""--------------""")
+        list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+        df = pd.DataFrame(list_of_dicts)
+        st.dataframe(df)
 
     label = "Coauthorship Network for whole SIRG network: "
     st.markdown(

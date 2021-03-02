@@ -91,14 +91,10 @@ def identify_find_missing():
         k: v for k, v in both_sets_locations.items() if v[1] is None
     }
 
-    # for k,v in both_sets_locations_missing.items():
-    #    key = both_sets_locations_missing[k][0].split(',')[-1]
-
-    try:
-        # assert 1 == 2
+    if os.path.exists("retry.p"):
         with open("retry.p", "rb") as f:
             retry = pickle.load(f)
-    except:
+    else:
         retry = {}
 
         for person_key, v in both_sets_locations_missing.items():
@@ -121,12 +117,10 @@ def identify_find_missing():
                 retry[person_key] = xy
                 check_none = xy[1]
         assert retry is not None
-        # print(type(retry),retry)
         import pprint
 
         pprint.pprint(retry)
 
-        # set(retry.keys()) -set(both_sets_locations_complete.keys());
         retry = {k: v for k, v in retry.items() if v[1] is not None}
         both_sets_locations_complete.update(retry)
 
@@ -142,6 +136,9 @@ def identify_find_missing():
         both_sets_locations_complete.update(g_locations)
     except:
         pass
+    #list_of_dicts = [ v for k,v in both_sets_locations.items()]
+    #df = pd.DataFrame(list_of_dicts)
+    #st.dataframe(df)
 
     both_sets_locations = both_sets_locations_complete
     missing_person_name = list(
