@@ -370,11 +370,8 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
     nodes = graph.nodes
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
-
-    # from sklearn.decomposition import PCA
     nodes_ind = [i for i in range(0, len(graph.nodes()))]
     redo = {k: v for k, v in zip(graph.nodes, nodes_ind)}
-
     pos_ = nx.get_node_attributes(graph, "pos")
     coords = []
     for node in graph.nodes:
@@ -392,26 +389,15 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
 
     ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
     hb = hammer_bundle(ds_nodes, ds_edges)
-
     hbnp = hb.to_numpy()
     splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
-
     start = 0
     segments = []
     for stop in splits:
         seg = hbnp[start:stop, :]
         segments.append(seg)
         start = stop
-    # fig, _ = plt.subplots(figsize=(20,20))
-    # draw world
-    # ax = world.plot(color='white', edgecolor='black',figsize=(20,20))
-    # fig = go.Figure(go.Scattergeo())
-    # fig.update_geos(projection_type="natural earth")
 
-    # draw bundle lines
-    # for seg in segments[::100]:
-    # 	ax.plot(seg[:,0], seg[:,1])
-    # draw nodes.
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
@@ -423,50 +409,24 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
         vmax=None,
         linewidths=None,
         label=None,
-    )  # , **kwds)
-
+    )
     df_geo = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
     df_geo["lat"] = [i[1] for i in pos_.values()]
     df_geo["lon"] = [i[0] for i in pos_.values()]
     df_geo["text"] = list(node for node in graph.nodes)
 
-    # make a figure
     fig = go.Figure()
-    # import plotly
-    # fig = plotly.subplots.make_subplots(specs=[[{"secondary_y": True}]])
-
-    # plot the number of confirmed cases.
-
-    # edge_x = []
-    # edge_y = []
-
-    # fig.add_trace(edge_trace)
-    # fig.add_trace(line_geo)
-
-    # fig.add_traces(
-    #    data=[get_edge_trace(graph)])
-    # draw the border of each country.
-    # fig.update_geos(
-    # 	showcountries=True
-    # )
     lats = []
     lons = []
     traces = []
     other_traces = []
-    # for seg in segments[::100]:print(seg)
-    for ind, seg in enumerate(segments):
+    for ind, seg in enumerate(segments[::100]):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
-        # lats.append(x0)#,x1))
-        # lons.append(y0)#,y1))
         xx = seg[:, 0]
         yy = seg[:, 1]
         lats.append(xx)
         lons.append(yy)
-        # main_trace = go.Scatter(
-        # 	x=xx, y=yy, mode='lines', showlegend=False,
-        # 	line={'color': 'red', 'width': 0.5},
-        # )
         for i, j in enumerate(xx):
             if i > 0:
                 other_traces.append(
@@ -478,14 +438,6 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
                         line=dict(width=0.5, color="red"),
                     )
                 )
-    # traces.append(other_traces[])
-
-    # import pdb
-    # pdb.set_trace()
-    # lines = px.line_geo(lat=lats, lon=lons)#, hover_name=names)
-
-    # for t in traces:
-    # fig.add_traces(traces)#,secondary_y=True)
 
     fig.add_trace(
         go.Scattergeo(
@@ -612,6 +564,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
         """ Computing an interactive version of this map now. In the meantime:
 	A lot of potential coauthors were excluded
 	see this list below:
+    Note sometimes this includes core SIRG authors, where initials are written. For contrast..
 	"""
     )
     missing_person_name = list(
