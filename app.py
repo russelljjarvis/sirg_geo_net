@@ -123,7 +123,7 @@ def passed():
 
 
 def big_plot_job():
-    if False:#os.path.exists("missing_person.p"):
+    if os.path.exists("missing_person.p"):
         with open("missing_person.p", "rb") as f:
             temp = pickle.load(f)
         [
@@ -176,7 +176,7 @@ def big_plot_job():
 
         except:
             pass
-    plt_unbundled, plt_bundled, ax3 = main_plot_routine(
+    plt_unbundled, plt_bundled, ax3 = (
         both_sets_locations, missing_person_name, node_location_name
     )  # ,author_list)
 
@@ -191,63 +191,35 @@ def main():
     figure_size = 200
     hv.output(size=figure_size)
     MAIN_AUTHOR = author_name = sirg_author_list[0]
-    with shelve.open("fast_graphs_splash.p") as db:
-        flag = author_name in db
-        # if False:
-        if flag:
-            fig = db[author_name]["chord"]
-            graph = db[author_name]["graph"]
-            df = db[author_name]["df"]
-            if "fig_pln" in db[author_name].keys():
-                fig_pln = db[author_name]["fig_pln"]
-            if "g" in db[author_name].keys():
-                g = db[author_name]["g"]
+    #g, df = author_to_coauthor_network(author_name)
+    #fig_pln = plotly_sized(g)
+    with open("mega_net.p", "rb") as f:
+        mg = pickle.load(f)
 
-        if flag:
-            g, df = author_to_coauthor_network(author_name)
-            fig_pln = plotly_sized(g)
-            graph = hv.Graph.from_networkx(
-                g, networkx.layout.fruchterman_reingold_layout
-            )
-            graph.opts(
-                color_index="circle",
-                width=450,
-                height=450,
-                show_frame=False,
-                xaxis=None,
-                yaxis=None,
-                tools=["hover", "tap"],
-                node_size=10,
-                cmap=["blue", "orange"],
-            )
-            # plot=dict(finalize_hooks=[disable_logo]),
-            edges_df = networkx.to_pandas_adjacency(g)
-            fig = chord2.make_filled_chord(edges_df)
-            db[author_name] = {
-                "chord": fig,
-                "graph": graph,
-                "df": df,
-                "fig_pln": fig_pln,
-                "g": g,
-            }
-        if len(db.keys()) > 20:
-            for k in db.keys():
-                try:
-                    print("try to thin out the dictionary")
-                    db.pop(k, None)
-                except:
-                    pass
-        db.close()
-
-    label = "Coauthorship Chord Network for: " + MAIN_AUTHOR
-    st.markdown(
-        "<h3 style='text-align: left; color: black;'>" + label + "</h3>",
-        unsafe_allow_html=True,
+    graph = hv.Graph.from_networkx(
+        mg, networkx.layout.fruchterman_reingold_layout
     )
-    st.write(fig)
-    st.markdown("""--------------""")
+    graph.opts(
+        color_index="circle",
+        width=450,
+        height=450,
+        show_frame=False,
+        xaxis=None,
+        yaxis=None,
+        tools=["hover", "tap"],
+        node_size=10,
+        cmap=["blue", "orange"],
+    )
 
-    label = "Coauthorship Network for: " + MAIN_AUTHOR
+    #label = "Coauthorship Chord Network for Whole SIRG network: "
+    #st.markdown(
+    #    "<h3 style='text-align: left; color: black;'>" + label + "</h3>",
+    #    unsafe_allow_html=True,
+    #)
+    #st.write(fig)
+    #st.markdown("""--------------""")
+
+    label = "Coauthorship Network for whole SIRG network: "
     st.markdown(
         "<h3 style='text-align: left; color: black;'>" + label + "</h3>",
         unsafe_allow_html=True,
@@ -263,10 +235,10 @@ def main():
     )
 
     big_plot_job()
-    
-    st.markdown(
-        """[My other science information dashboard app](https://agile-reaches-20338.herokuapp.com/)"""
-    )
+
+    #st.markdown(
+    #    """[My other science information dashboard app](https://agile-reaches-20338.herokuapp.com/)"""
+    #)
     """
 	[Source Code:](https://github.com/russelljjarvis/CoauthorNetVis)
 	"""

@@ -340,9 +340,11 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     fig, ax = plt.subplots(figsize=(30, 30))
 
     ax = world.plot(color="white", edgecolor="black", figsize=(30, 30))
-    for seg in segments:  # [::100]:
+    #for seg in segments:  # [::100]:
+    for ind, seg in enumerate(tqdm(segments)):
         ax.plot(seg[:, 0], seg[:, 1])
-
+    with open('segments.p','wb') as f:
+        pickle.dump(segments,f)
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
@@ -363,42 +365,46 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     st.pyplot(plt)
     # st.pyplot(fig)
 
-    return fig, ax3, ax3
+    return fig, ax3, ax3, segments
 
 from auxillary_methods import tqdm
 
-def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
+def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=None,pos_=None):
     nodes = graph.nodes
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
     nodes_ind = [i for i in range(0, len(graph.nodes()))]
     redo = {k: v for k, v in zip(graph.nodes, nodes_ind)}
-    pos_ = nx.get_node_attributes(graph, "pos")
-    coords = []
-    for node in graph.nodes:
-        x, y = pos_[node]
-        coords.append((x, y))
-    nodes_py = [
-        [new_name, pos[0], pos[1]]
-        for name, pos, new_name in zip(nodes, coords, nodes_ind)
-    ]
-    ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
+    if pos_ is None:
+        pos_ = nx.get_node_attributes(graph, "pos")
+    if segments is None:
+        coords = []
+        for node in graph.nodes:
+            x, y = pos_[node]
+            coords.append((x, y))
+        nodes_py = [
+            [new_name, pos[0], pos[1]]
+            for name, pos, new_name in zip(nodes, coords, nodes_ind)
+        ]
+        ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
 
-    ds_edges_py = []
-    for (n0, n1) in graph.edges:
-        ds_edges_py.append([redo[n0], redo[n1]])
+        ds_edges_py = []
+        for (n0, n1) in graph.edges:
+            ds_edges_py.append([redo[n0], redo[n1]])
 
-    ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
-    hb = hammer_bundle(ds_nodes, ds_edges)
-    hbnp = hb.to_numpy()
-    splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
-    start = 0
-    segments = []
-    for stop in splits:
-        seg = hbnp[start:stop, :]
-        segments.append(seg)
-        start = stop
+        ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
 
+        hb = hammer_bundle(ds_nodes, ds_edges)
+        hbnp = hb.to_numpy()
+        splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
+        start = 0
+
+        segments = []
+        for stop in splits:
+            seg = hbnp[start:stop, :]
+            segments.append(seg)
+            start = stop
+    '''
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
@@ -411,6 +417,7 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
         linewidths=None,
         label=None,
     )
+    '''
     df_geo = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
     df_geo["lat"] = [i[1] for i in pos_.values()]
     df_geo["lon"] = [i[0] for i in pos_.values()]
@@ -534,7 +541,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
         df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude)
     )
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-    fig, ax3, plt_bundled = data_bundle(second, world, colors, sirg_author_list, tab10)
+    fig, ax3, plt_bundled,segments = data_bundle(second, world, colors, sirg_author_list, tab10)
 
     st.markdown(""" Computing an interactive version of this map now.""")
     # In the meantime:
@@ -554,7 +561,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     #st.dataframe(ds_nodes)
     st.markdown("""Okay now making an interactive version of this plot ...""")
 
-    fig = data_bundle_plotly(second, world, colors, sirg_author_list, tab10)
+    fig = data_bundle_plotly(second, world, colors, sirg_author_list, tab10, segments=segments)
 
     # graph_for_app(pos,second)
     return plt, plt_bundled, ax3
