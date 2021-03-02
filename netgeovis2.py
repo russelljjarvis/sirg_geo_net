@@ -611,7 +611,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     fig, ax3, plt_bundled = data_bundle(second, world, colors, sirg_author_list, tab10)
 
     st.markdown(
-        """
+        """ Computing an interactive version of this map now. In the meantime:
 	A lot of potential coauthors were excluded
 	see this list below:
 	"""
