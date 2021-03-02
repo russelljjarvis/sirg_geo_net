@@ -6,8 +6,20 @@ import glob
 import requests
 from flask import render_template
 import json
-from geopy.geocoders import Nominatim
+import geopy
+geopy.geocoders.options.default_user_agent = 'my_app/1'
+geopy.geocoders.options.default_timeout = 7
+from geopy.geocoders import get_geocoder_for_service
+import pprint
+# import Exceptions from GeoPy
+from geopy.exc import (
+    GeocoderQueryError,
+    GeocoderQuotaExceeded,
+    ConfigurationError,
+    GeocoderParseError,
+)
 
+from geopy.geocoders import Nominatim
 #results = js2py.run_file("data/affiliationList.js")
 #affil_dict = results[0].to_dict()
 
@@ -28,15 +40,15 @@ for name in jsondatafiles:
 	key = str(name.split("data/js/")[1])
 	json_data_contents[key] = results#results[0].to_dict()
 
-global py_geo_map
-py_geo_map = {}
+global existing_uni_coords
+existing_uni_coords = {}
 results = js2py.run_file("data/affiliationList.js")
 holding = results[0].to_dict()
-#pdb.set_trace()
+
 for k,v in holding.items():
 	key = v['Name']
 	value = v['Position']
-	py_geo_map[key] = value
+	existing_uni_coords[key] = value
 
 def university_data_frame():
 	wu = pd.read_csv("data/world-universities.csv")
@@ -48,35 +60,46 @@ def university_data_frame():
 		},
 		inplace=True,
 	)
-	return wu, list(wu["university"])
+	wu_as_dict = dict(zip(wu.university, wu.country))
+	#existing_uni_coords.update()
+	return wu, list(wu["university"]), wu_as_dict
 
+'''
+# after geocode call, if no result found, raise a ValueError
+from geopy.geocoders import GoogleV3
+'''
+
+def geocode(geocoder, config, query):
+    cls = get_geocoder_for_service(geocoder)
+    geolocator = cls(**config)
+    location = geolocator.geocode(query)
+    return location.address
+
+
+global geolocator
+geolocator = Nominatim(user_agent="SIRG")
+
+#geolocator = GoogleV3(api_key='AIzaSyCxk0i1WQokYRgUxAZieq')
 
 def coords_of_target_university(search_key):
-	# search_key = "Arizona State"
-	# search_key = "University of Melbourne"
 
-	for k,v in py_geo_map.items():
+	for k,v in existing_uni_coords.items():
 		if search_key in k:
 			return (k,v)
+
 		else:
 
-			geolocator = Nominatim(user_agent="SIRG")
 			location = geolocator.geocode(search_key)
 			if location is not None:
 				v = (location.latitude,location.longitude)
-				print(search_key,v)
 				return (search_key, v)
-			else:
-				print(None,search_key)
+			if location is None:
+				return (search_key,None)
 
-		#else:
-		#    if k in search_key:
-		#        return (k,v)
 
-	return None
 
 def update_csv_with_website_lang_long():
-	wu, list_univ = university_data_frame()#.to_dict()
+	wu, list_univ,wu_as_dict = university_data_frame()#.to_dict()
 
 	for un in list_univ:
 		key = un
@@ -85,7 +108,8 @@ def update_csv_with_website_lang_long():
 			name,coords = ret
 			# add a new coordinates column to data frame.
 			wu[un]["coords"] = coords
-
+			wu_as_dict[un] = coords
+	return wu_as_dict
 #def unpickle_citations(author_name,results):
 #    author_name = str(author_name)
 #    with open('scholar_results'+str(author_name)+'.p','rb') as f:

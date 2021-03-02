@@ -16,8 +16,7 @@ def read_requirements():
 
 setup(
     name="authornetvis",
-    version="1.0",
-    description="heavily applied scraping, crawling and language analysis, tightly coupled with the goal of analysing scientific discourse",
+    description="Coauthorship network visualisation (interactive)",
     author="various",
     author_email="russelljarvis@protonmail.com",
     url="https://russelljjarvis@github.com/russelljjarvis/CoauthorNetVis.git",

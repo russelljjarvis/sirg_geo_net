@@ -11,11 +11,40 @@ import pickle
 import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
-#from datashader.bundling import hammer_bundle
+from datashader.bundling import hammer_bundle
 import matplotlib.pyplot as plt
 import networkx as nx
 
 import numpy as np
+
+
+
+def unpaywall_semantic_links(NAME, tns):
+    """
+    inputs a URL that's full of publication orientated links, preferably the
+    authors scholar page.
+    """
+    dois, coauthors, titles, visit_urls = author_to_urls(NAME)
+    visit_more_urls = []
+    for index, doi_ in enumerate(tqdm(dois, title="Building Suitable Links")):
+        r0 = str("https://api.semanticscholar.org/") + str(doi_)
+        visit_more_urls.append(r0)
+    return visit_more_urls
+
+def visit_link(NAME):
+    """
+    inputs a URL that's full of publication orientated links, preferably the
+    authors scholar page.
+    """
+    more_links={}
+    author_results = []
+    dois, coauthors, titles, visit_urls = author_to_urls(NAME)
+    visit_urls.extend(more_links)
+    for index, link in enumerate(
+        tqdm(visit_urls, title="Text mining via API calls. Please wait.")
+    ):
+        requests.get(link)
+    return author_results, visit_urls
 
 def draw_wstate_tree(G):
 
@@ -162,7 +191,7 @@ def data_shade(graph):
     weights = (
         np.asarray(list(map(lambda x: x[-1]["weight"], graph.edges(data=True)))) ** 2
     )
-    pos_ = nx.fruchterman_reingold_layout(graph)
+    pos_ = nx.get_attribute(pos)
     coords = []
     for node in graph.nodes:
         x, y = pos_[node]

@@ -119,10 +119,10 @@ def author_to_gaffiliations(NAME):
 	search_query = list(scholarly.search_author(NAME))
 	if len(search_query):
 		sq = search_query[0]
-		citedby = sq['citedby']
+		#citedby = sq['citedby']
 		afil = sq['affiliation']
 		#print(afil,"g afil")
-		return citedby
+		return afil
 	else:
 		return None
 
@@ -139,9 +139,12 @@ def author_to_gh_index(NAME):
 
 		#import pdb
 		#pdb.set_trace()
-		afil = sq['affiliation']
-		print(afil,"g afil")
-		return sq['citedby']
+		#afil = sq['affiliation']
+		#print(afil,"g afil")
+		if hasattr(sq,'citedby'):
+			return sq['citedby']
+		else:
+			return None
 	else:
 		return None
 		#res_author_search = scholarly.fill(sq)
