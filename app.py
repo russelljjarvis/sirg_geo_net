@@ -171,6 +171,9 @@ def main():
         """Geo Geographic Maps for whole SIRG network are time intensive to compute."""
     )
     image = Image.open("bundled_graph_static.png")
+    st.markdown(
+        """Big image try scrolling down..."""
+    )
 
     st.image(
         image,
@@ -201,22 +204,6 @@ def main():
         node_size=10,
         cmap=["blue", "orange"],
     )
-    if os.path.exists("missing_person.p"):
-        with open("missing_person.p", "rb") as f:
-            temp = pickle.load(f)
-        [
-            mg,
-            both_sets_locations,
-            missing_person_name,
-            missing_person_location,
-            both_sets_locations_missing,
-            sirg_author_list,
-        ] = temp
-
-        # list_of_dicts = [ list(v) for k,v in both_sets_locations_missing.items()]
-        # df = pd.DataFrame(list_of_dicts)
-        # st.dataframe(df)
-
     label = "Coauthorship Network for whole SIRG network: "
     st.markdown(
         "<h3 style='text-align: left; color: black;'>" + label + "</h3>",
@@ -234,6 +221,24 @@ def main():
         unsafe_allow_html=True,
     )
     st.markdown("""geo plots computing...""")
+
+
+    if os.path.exists("missing_person.p"):
+        with open("missing_person.p", "rb") as f:
+            temp = pickle.load(f)
+        [
+            mg,
+            both_sets_locations,
+            missing_person_name,
+            missing_person_location,
+            both_sets_locations_missing,
+            sirg_author_list,
+        ] = temp
+
+        # list_of_dicts = [ list(v) for k,v in both_sets_locations_missing.items()]
+        # df = pd.DataFrame(list_of_dicts)
+        # st.dataframe(df)
+
     big_plot_job()
 
     # st.markdown(
