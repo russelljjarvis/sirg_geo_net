@@ -96,8 +96,8 @@ def identify_find_missing():
 			#
 			##
 			xy = coords_of_target_university(location_key)
-			check_none = xy[1]
-			if check_none is None:
+			#check_none = xy#[1]
+			if xy is None:
 				search = both_sets_locations_missing[person_key][0].split(' ')#[-2:-1]
 				xy = coords_of_target_university(search[-2]+str(' ')+search[-1])
 				check_none = xy[1]
