@@ -18,7 +18,6 @@ import networkx as nx
 import numpy as np
 
 
-
 def unpaywall_semantic_links(NAME, tns):
     """
     inputs a URL that's full of publication orientated links, preferably the
@@ -31,12 +30,13 @@ def unpaywall_semantic_links(NAME, tns):
         visit_more_urls.append(r0)
     return visit_more_urls
 
+
 def visit_link(NAME):
     """
     inputs a URL that's full of publication orientated links, preferably the
     authors scholar page.
     """
-    more_links={}
+    more_links = {}
     author_results = []
     dois, coauthors, titles, visit_urls = author_to_urls(NAME)
     visit_urls.extend(more_links)
@@ -46,19 +46,22 @@ def visit_link(NAME):
         requests.get(link)
     return author_results, visit_urls
 
+
 def draw_wstate_tree(G):
 
-    #from networkx.drawing.nx_agraph import write_dot, graphviz_layout
+    # from networkx.drawing.nx_agraph import write_dot, graphviz_layout
     pos = nx.spring_layout(G)
-    #pos = graphviz_layout(G, prog='dot')
-    edge_labels = nx.get_edge_attributes(G, 'label')
+    # pos = graphviz_layout(G, prog='dot')
+    edge_labels = nx.get_edge_attributes(G, "label")
     nx.draw(G, pos)
     nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8)
     nx.draw_networkx_labels(G, pos, font_size=10)
-    matplotlib.use('Agg')
+    matplotlib.use("Agg")
 
     plt.savefig("whole_net.png")
     st.write(plt.show())
+
+
 # Custom function to create an edge between node x and node y, with a given text and width
 def make_edge(x, y, text, width):
     return go.Scatter(
@@ -147,7 +150,9 @@ def plotly_sized(g):
     fig.update_yaxes(showticklabels=False)  # Show figure
     return fig
     # fig.show()
-'''
+
+
+"""
 def try_again(g):
     from holoviews.operation.datashader import datashade, bundle_graph
     import holoviews as hv
@@ -208,7 +213,8 @@ def data_shade(graph):
     hb = hammer_bundle(ds_nodes, ds_edges)
     fig = hb.plot(x="x", y="y", figsize=(9, 9))
     return fig
-'''
+"""
+
 
 def university_data_frame():
 

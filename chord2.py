@@ -240,11 +240,7 @@ def make_filled_chord(M):  # ,labels):
                     )
                 )
                 z = 0.9 * np.exp(1j * (l[0] + l[1]) / 2)
-                text = (
-                    labels[k]
-                    + " co-occurs with "
-                    + "{0}".format(M.iloc[k, k])
-                )
+                text = labels[k] + " co-occurs with " + "{0}".format(M.iloc[k, k])
                 ribbon_info.append(
                     go.Scatter(
                         x=[z.real],
