@@ -535,13 +535,13 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
     fig, ax3, plt_bundled = data_bundle(second, world, colors, sirg_author_list, tab10)
 
-    st.markdown(
-        """ Computing an interactive version of this map now. In the meantime:
-	A lot of potential coauthors were excluded
-	see this list below:
-    Note sometimes this includes core SIRG authors, where initials are written. For contrast..
-	"""
-    )
+    st.markdown(""" Computing an interactive version of this map now.""")
+    # In the meantime:
+	#A lot of potential coauthors were excluded
+	#see this list below:
+    #Note sometimes this includes core SIRG authors, where initials are written. For contrast..
+	#"""
+    #)
     missing_person_name = list(
         [k for k, v in both_sets_locations.items() if v[1] is None]
     )
@@ -550,7 +550,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
 
     missing_person_name = [name for name in missing_person_name if name not in str("Brian Smith")]
     ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
-    st.dataframe(ds_nodes)
+    #st.dataframe(ds_nodes)
     st.markdown("""Okay now making an interactive version of this plot ...""")
 
     fig = data_bundle_plotly(second, world, colors, sirg_author_list, tab10)
