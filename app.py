@@ -132,39 +132,19 @@ def big_plot_job():
 
 def main():
 	st.markdown("""--------------""")
-	st.title("""Geo Geographic Maps are hard to compute, so first we will populate the screen
-	with other stuff while we build them...""")
+	st.title("""Geo Geographic Maps are hard to compute, so first we will populate the screen""")
+	st.markdown("""...with other stuff while we build them...""")
 
 
 
 
 	figure_size = 200
 	hv.output(size=figure_size)
-	'''
-	st.title("Create a Coauthorship Network")
-	author_name1 = st.text_input("Enter Author Name:")
-
-	Note: Search applies [dissmin](https://dissemin.readthedocs.io/en/latest/api.html) API backend
-
-	options = tuple(sirg_author_list)
-	author_name0 = st.sidebar.radio("Which author are you interested in?", options)
-
-	if author_name1:
-		author_name = author_name1
-		author_name0 = None
-
-	if author_name0:
-		author_name = author_name0
-		author_name1 = None
-
-	if author_name0 or author_name1:
-		st.markdown("""## You Chose the Author: {0} """.format(author_name))
-		MAIN_AUTHOR = author_name
-	'''
+	author_name = sirg_author_list[0]
 	with shelve.open("fast_graphs_splash.p") as db:
 		flag = author_name in db
-		if False:
-		#if flag:
+		#if False:
+		if flag:
 			fig = db[author_name]["chord"]
 			graph = db[author_name]["graph"]
 			df = db[author_name]["df"]
