@@ -466,34 +466,9 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
             hovertemplate="%{text} <extra></extra>",
         )
     )
-
-    # ,get_edge_trace(graph))
-    # fig2 = px.line_geo(lat=lats, lon=lons)#, hover_name=names)
-    # st.write(fig2)
-    # fig.add_traces(traces)
-    # fig.update_layout()
-    # fig.update_layout(showlegend = False,height=300, margin={"r":0,"t":0,"l":0,"b":0})
-    # fig.update_geos(projection_type="natural earth")
-
-    # fig.update_geos(
-    #    visible=True, resolution=110, scope="world",
-    # #   showcountries=True, countrycolor="Black",
-    #    showsubunits=True, subunitcolor="Blue"
-    # )
-    # fig.update_layout(height=300, margin={"r":0,"t":0,"l":0,"b":0})
     fig.add_traces(other_traces)
-
-    st.write(fig)  # .show()
-
-    # plot.show()
-    # for i,v in enumerate(sirg_author_list):
-    # 	plt.scatter([],[], c=tab10[i], label='SIRG PI {}'.format(v))
-    # plt.legend()
-
-    # st.pyplot(plt)
-    # st.pyplot(fig)
-
-    return fig  # , ax3, ax3
+    st.write(fig)
+    return fig
 
 
 def main_plot_routine(both_sets_locations, missing_person_name, node_location_name):

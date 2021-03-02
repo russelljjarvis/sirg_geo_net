@@ -123,7 +123,7 @@ def passed():
 
 
 def big_plot_job():
-    if os.path.exists("missing_person.p"):
+    if False:#os.path.exists("missing_person.p"):
         with open("missing_person.p", "rb") as f:
             temp = pickle.load(f)
         [
