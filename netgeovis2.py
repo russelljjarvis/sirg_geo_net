@@ -90,6 +90,9 @@ def identify_find_missing():
     both_sets_locations_missing = {
         k: v for k, v in both_sets_locations.items() if v[1] is None
     }
+    list_of_dicts = [ v for k,v in both_sets_locations.items()]
+    df = pd.DataFrame(list_of_dicts)
+    st.dataframe(df)
 
     if os.path.exists("retry.p"):
         with open("retry.p", "rb") as f:
@@ -117,15 +120,14 @@ def identify_find_missing():
                 retry[person_key] = xy
                 check_none = xy[1]
         assert retry is not None
-        import pprint
-
-        pprint.pprint(retry)
+        #import pprint
+        #pprint.pprint(retry)
 
         retry = {k: v for k, v in retry.items() if v[1] is not None}
         both_sets_locations_complete.update(retry)
-        #list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
-        #df = pd.DataFrame(list_of_dicts)
-        #st.dataframe(df)
+        list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+        df = pd.DataFrame(list_of_dicts)
+        st.dataframe(df)
         import copy
 
         with open("retry.p", "wb") as f:
@@ -152,9 +154,9 @@ def identify_find_missing():
     both_sets_locations_missing = {
         k: v for k, v in both_sets_locations.items() if v[1] is None
     }
-    list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
-    df = pd.DataFrame(list_of_dicts)
-    st.dataframe(df)
+    #list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+    #df = pd.DataFrame(list_of_dicts)
+    #st.dataframe(df)
     return (
         mg,
         both_sets_locations,
@@ -343,7 +345,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
 
     ax = world.plot(color="white", edgecolor="black", figsize=(30, 30))
     #for seg in segments:  # [::100]:
-    for ind, seg in enumerate(tqdm(segments)):
+    for ind, seg in enumerate(tqdm(segments,title='Bundling Edges')):
         ax.plot(seg[:, 0], seg[:, 1])
     with open('segments.p','wb') as f:
         pickle.dump(segments,f)
@@ -430,7 +432,7 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
     lons = []
     traces = []
     other_traces = []
-    for ind, seg in enumerate(tqdm(segments)):
+    for ind, seg in enumerate(tqdm(segments,title='Bundling Edges')):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
@@ -547,6 +549,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     )
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
     fig, ax3, plt_bundled,segments = data_bundle(second, world, colors, sirg_author_list, tab10)
+    assert segments is not None
 
     st.markdown(""" Computing an interactive version of this map now.""")
     # In the meantime:
@@ -565,7 +568,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
     #st.dataframe(ds_nodes)
     st.markdown("""Okay now making an interactive version of this plot ...""")
-
+    assert segments is not None
     fig = data_bundle_plotly(second, world, colors, sirg_author_list, tab10, segments=segments)
 
     # graph_for_app(pos,second)
