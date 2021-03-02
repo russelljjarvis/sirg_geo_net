@@ -32,7 +32,7 @@ import colorlover as cl
 from matplotlib import cm
 import holoviews as hv
 from auxillary_methods import plotly_sized
-from grab_js import coords_of_target_university, university_data_frame
+from grab_js import coords_of_target_university#, university_data_frame
 
 from collections import OrderedDict
 from datashader.bundling import hammer_bundle

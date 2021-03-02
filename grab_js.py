@@ -80,7 +80,8 @@ global geolocator
 geolocator = Nominatim(user_agent="SIRG")
 
 #geolocator = GoogleV3(api_key='AIzaSyCxk0i1WQokYRgUxAZieq')
-
+global existing_uni_coords
+existing_uni_coords = {}
 def coords_of_target_university(search_key):
 
 	for k,v in existing_uni_coords.items():
