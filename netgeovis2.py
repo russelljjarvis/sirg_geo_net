@@ -365,6 +365,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
 
     return fig, ax3, ax3
 
+from auxillary_methods import tqdm
 
 def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
     nodes = graph.nodes
@@ -420,7 +421,7 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
     lons = []
     traces = []
     other_traces = []
-    for ind, seg in enumerate(segments):
+    for ind, seg in enumerate(tqdm(segments)):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
