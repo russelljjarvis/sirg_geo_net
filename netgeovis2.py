@@ -420,7 +420,7 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10):
     lons = []
     traces = []
     other_traces = []
-    for ind, seg in enumerate(segments[::100]):
+    for ind, seg in enumerate(segments):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
