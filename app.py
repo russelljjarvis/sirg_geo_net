@@ -184,7 +184,7 @@ def big_plot_job():
 def main():
     st.markdown("""--------------""")
     st.title(
-        """Geo Geographic Maps are time intensive to compute, so first we will populate the screen while you wait"""
+        """Geo Geographic Maps for whole SIRG network are time intensive to compute, so first we will populate the screen while you wait"""
     )
     st.markdown("""...with other stuff while we build them...""")
 
@@ -257,7 +257,7 @@ def main():
     # st.markdown("""Geo Geographic Maps computing now, this will take time""")
     st.markdown(
         "<h1 style='text-align: left; color: black;'>"
-        + str("Geo Geographic Maps computing now, this will take time")
+        + str("Geographic Maps for whole sirg network computing now, this will take time")
         + "</h1>",
         unsafe_allow_html=True,
     )
