@@ -55,7 +55,7 @@ import streamlit as st
 import numpy as np
 import pickle
 
-from netgeovis2 import main_plot_routine, identify_find_missing,remove_missing_persons_from_big_net
+import main_plot_routine, identify_find_missing,remove_missing_persons_from_big_net
 import pandas as pd
 with open('both_sets_locations.p','rb') as f:
 	both_sets_locations = pickle.load(f)
