@@ -1,3 +1,6 @@
+geopandas
+pygeos
+geopandas
 geopy
 scikit-image
 selenium
