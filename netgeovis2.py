@@ -621,11 +621,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
         missing_person_name = pickle.load(f)
     ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
     st.dataframe(ds_nodes)
-    st.markdown(
-    """
-	okay now making an interactive version of this plot
-	"""
-    )
+    st.markdown("""Okay now making an interactive version of this plot ...""")
 
     fig = data_bundle_plotly(second, world, colors, sirg_author_list, tab10)
 
