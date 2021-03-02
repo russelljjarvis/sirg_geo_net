@@ -310,43 +310,50 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     nodes = graph.nodes
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
-
-    nodes_ind = [i for i in range(0, len(graph.nodes()))]
-    redo = {k: v for k, v in zip(graph.nodes, nodes_ind)}
-
     pos_ = nx.get_node_attributes(graph, "pos")
-    coords = []
-    for node in graph.nodes:
-        x, y = pos_[node]
-        coords.append((x, y))
-    nodes_py = [
-        [new_name, pos[0], pos[1]]
-        for name, pos, new_name in zip(nodes, coords, nodes_ind)
-    ]
-    ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
 
-    ds_edges_py = []
-    for (n0, n1) in graph.edges:
-        ds_edges_py.append([redo[n0], redo[n1]])
+    if os.path.exists('segments.p'):
+        with open('segments.p','rb') as f:
+            segments = pickle.load(f)
 
-    ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
-    hb = hammer_bundle(ds_nodes, ds_edges)
+    else:
+        nodes_ind = [i for i in range(0, len(graph.nodes()))]
+        redo = {k: v for k, v in zip(graph.nodes, nodes_ind)}
 
-    hbnp = hb.to_numpy()
-    splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
+        coords = []
+        for node in graph.nodes:
+            x, y = pos_[node]
+            coords.append((x, y))
+        nodes_py = [
+            [new_name, pos[0], pos[1]]
+            for name, pos, new_name in zip(nodes, coords, nodes_ind)
+        ]
+        ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
 
-    start = 0
-    segments = []
-    for stop in splits:
-        seg = hbnp[start:stop, :]
-        segments.append(seg)
-        start = stop
+        ds_edges_py = []
+        for (n0, n1) in graph.edges:
+            ds_edges_py.append([redo[n0], redo[n1]])
+
+        ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
+        hb = hammer_bundle(ds_nodes, ds_edges)
+
+        hbnp = hb.to_numpy()
+        splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
+
+        start = 0
+        segments = []
+        for stop in splits:
+            seg = hbnp[start:stop, :]
+            segments.append(seg)
+            start = stop
     fig, ax = plt.subplots(figsize=(30, 30))
 
-    ax = world.plot(color="white", edgecolor="black", figsize=(30, 30))
+    ax = world.plot(color="white", edgecolor="black", figsize=(40, 40))
     #for seg in segments:  # [::100]:
     for ind, seg in enumerate(tqdm(segments,title='Bundling Edges')):
         ax.plot(seg[:, 0], seg[:, 1])
+    assert segments is not None
+
     with open('segments.p','wb') as f:
         pickle.dump(segments,f)
     ax3 = nx.draw_networkx_nodes(
@@ -365,6 +372,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     for i, v in enumerate(sirg_author_list):
         plt.scatter([], [], c=tab10[i], label="SIRG PI {}".format(v))
     plt.legend()
+    plt.savefig("bundled_graph_static.png")
 
     st.pyplot(plt)
     # st.pyplot(fig)
@@ -381,6 +389,10 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
     redo = {k: v for k, v in zip(graph.nodes, nodes_ind)}
     if pos_ is None:
         pos_ = nx.get_node_attributes(graph, "pos")
+
+    assert segments is not None
+
+
     if segments is None:
         coords = []
         for node in graph.nodes:
@@ -408,20 +420,6 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
             seg = hbnp[start:stop, :]
             segments.append(seg)
             start = stop
-    '''
-    ax3 = nx.draw_networkx_nodes(
-        graph,
-        orig_pos,
-        node_size=15,
-        node_color=colors,
-        node_shape="o",
-        alpha=1.0,
-        vmin=None,
-        vmax=None,
-        linewidths=None,
-        label=None,
-    )
-    '''
     df_geo = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
     df_geo["lat"] = [i[1] for i in pos_.values()]
     df_geo["lon"] = [i[0] for i in pos_.values()]
@@ -432,7 +430,8 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
     lons = []
     traces = []
     other_traces = []
-    for ind, seg in enumerate(tqdm(segments,title='Bundling Edges')):
+    st.markdown("""Note only 200 node edges are shown here, because making the full list of {0} edges interactive would take hours""".format(len(segments)))
+    for ind, seg in enumerate(tqdm(segments[::200],title='Bundling Edges')):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
@@ -479,9 +478,9 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
         )
     )
     fig.add_traces(other_traces)
-
-    layout["width"] = 625
-    layout["height"] = 625
+    #layout = fig["layout"]
+    fig["layout"]["width"] = 825
+    fig["layout"]["height"] = 825
     st.write(fig)
     return fig
 

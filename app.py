@@ -98,29 +98,6 @@ def get_table_download_link_csv(df):
     return href
 
 
-# push_frame_to_screen(df.head())
-def passed():
-    with shelve.open("fast_graphs_splash.p") as db:
-        flag = author_name in db
-        if flag:
-            try:
-                fig_pln = plotly_sized(db[author_name]["fig_pln"])
-            except:
-                g, df = author_to_coauthor_network(author_name)
-                fig_pln = plotly_sized(g)
-            db[author_name]["g"] = g
-            db[author_name]["fig_pln"] = fig_pln
-    st.markdown("""--------------""")
-    st.markdown(
-        "<h3 style='text-align: left; color: black;'>"
-        + str("Experimental Graph:")
-        + "</h3>",
-        unsafe_allow_html=True,
-    )
-    # st.write(fig_shade)
-    st.write(fig_pln)
-
-
 def big_plot_job():
     if os.path.exists("missing_person.p"):
         with open("missing_person.p", "rb") as f:
@@ -185,13 +162,24 @@ def big_plot_job():
     #main_plot_routine(both_sets_locations, missing_person_name, node_location_name)
 
 
+from PIL import Image
 
 def main():
+
+
     st.markdown("""--------------""")
     st.title(
-        """Geo Geographic Maps for whole SIRG network are time intensive to compute, so first we will populate the screen while you wait"""
+        """Geo Geographic Maps for whole SIRG network are time intensive to compute."""
     )
-    st.markdown("""...with other stuff while we build them...""")
+    image = Image.open('bundled_graph_static.png')
+
+    st.image(image, caption='a cached: Bundled Geographic Network map of greater SIRG network',
+              use_column_width=True)
+
+
+    st.markdown("""Recomputing graphs in case data was revised. In the meantime we will populate the screen while you wait with other stuff while we re-build them...""")
+
+
     identify_find_missing()
     figure_size = 200
     hv.output(size=figure_size)
