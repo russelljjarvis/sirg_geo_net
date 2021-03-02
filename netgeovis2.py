@@ -307,7 +307,6 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
 
-    # from sklearn.decomposition import PCA
     nodes_ind = [i for i in range(0, len(graph.nodes()))]
     redo = {k: v for k, v in zip(graph.nodes, nodes_ind)}
 
@@ -328,7 +327,6 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
 
     ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
     hb = hammer_bundle(ds_nodes, ds_edges)
-    # fig = hb.plot(x="x", y="y", figsize=(9, 9))
 
     hbnp = hb.to_numpy()
     splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
@@ -339,10 +337,10 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
         seg = hbnp[start:stop, :]
         segments.append(seg)
         start = stop
-    fig, _ = plt.subplots(figsize=(20, 20))
+    fig, ax = plt.subplots(figsize=(30, 30))
 
-    ax = world.plot(color="white", edgecolor="black", figsize=(20, 20))
-    for seg in segments[::200]:  # [::100]:
+    ax = world.plot(color="white", edgecolor="black", figsize=(30, 30))
+    for seg in segments:  # [::100]:
         ax.plot(seg[:, 0], seg[:, 1])
 
     ax3 = nx.draw_networkx_nodes(
@@ -624,7 +622,7 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
     st.dataframe(ds_nodes)
     st.markdown(
-        """
+    """
 	okay now making an interactive version of this plot
 	"""
     )
