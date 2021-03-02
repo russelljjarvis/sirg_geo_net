@@ -462,7 +462,6 @@ def data_bundle_plotly(graph,world,colors,sirg_author_list,tab10):
 
 
 def main_plot_routine(both_sets_locations,missing_person_name,node_location_name):
-	#if False:
 	if os.path.exists('net_cache.p'):
 		with open('net_cache.p','rb') as f:
 			temp = pickle.load(f)
@@ -499,38 +498,21 @@ def main_plot_routine(both_sets_locations,missing_person_name,node_location_name
 	gdf = geopandas.GeoDataFrame(
 		df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude))
 	world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
-	#ax = world.plot(
-	#	color='white', edgecolor='black',figsize=(20,20))
-	'''
-	#ax1 = nx.draw(second,pos,node_size=21, node_color=colors, node_shape='o', alpha=0.7, edge_color='grey', width=0.1)
-	fig = plt.figure()#frameon=False,figsize=(20,20))
-
-	pos=nx.get_node_attributes(second,'pos')
-
-	#ax1 = nx.draw(second,pos,node_size=21,  node_shape='o', alpha=0.7, edge_color='grey', width=0.1)
-	ax2 = nx.draw_networkx_edges(second, pos, width=0.15, edge_color=edge_colors, style='solid', alpha=0.15, ax=ax, edge_vmin=None, edge_vmax=None, arrows=True, label=None)#, **kwds)
-
-	ax3 = nx.draw_networkx_nodes(second, pos, node_size=21,node_color=colors, node_shape='o', alpha=1.0, vmin=None, vmax=None, linewidths=None, label=None)#, **kwds)
-	sirg_author_list = [
-	"Brian H Smith",
-	"Christian Rabeling",
-	"Jon F Harrison",
-	"Juergen Liebig",
-	"Stephen C Pratt",
-	"Jennifer H Fewell",
-	"Arianne J Cease",
-	"Gro V Amdam",
-	]
-
-	for i,v in enumerate(sirg_author_list):
-		plt.scatter([],[], c=tab10[i], label='SIRG PI {}'.format(v))
-	plt.legend()
-	st.pyplot(plt)
-	'''
-	#plt_unbundled = plt
-
 	fig, ax3, plt_bundled = data_bundle(second,world,colors,sirg_author_list,tab10)
-	#plt_bundled = plt
+
+	st.markdown('''
+	A lot of potential coauthors were excluded
+	see this list below:
+	''')
+	missing_person_name = list([k for k,v in both_sets_locations.items() if v[1] is None])
+	with open('missing_person_name.p','rb') as f:
+		missing_person_name = pickle.load(f)
+	ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
+	st.dataframe(ds_nodes)
+	st.markdown('''
+	okay now making an interactive version of this plot
+	''')
+
 	fig = data_bundle_plotly(second,world,colors,sirg_author_list,tab10)
 
 	#graph_for_app(pos,second)

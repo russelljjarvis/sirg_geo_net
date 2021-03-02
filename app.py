@@ -211,15 +211,7 @@ def main():
 		+ "</h1>",
 		unsafe_allow_html=True,
 	)
-	'''
-	A lot of potential coauthors were excluded
-	see this list below:
-	'''
-	missing_person_name = list([k for k,v in both_sets_locations.items() if v[1] is None])
-	with open('missing_person_name.p','rb') as f:
-		missing_person_name = pickle.load(f)
-	ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
-	st.dataframe(ds_nodes)
+
 
 	big_plot_job()
 	st.markdown(
