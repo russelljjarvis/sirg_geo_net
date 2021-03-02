@@ -263,14 +263,7 @@ def main():
     )
 
     big_plot_job()
-    st.markdown(
-        "<h3 style='text-align: left; color: black;'>"
-        + str("Here are some of the publications dissmin used to build these networks.")
-        + "</h3>",
-        unsafe_allow_html=True,
-    )
-    push_frame_to_screen(df)
-
+    
     st.markdown(
         """[My other science information dashboard app](https://agile-reaches-20338.herokuapp.com/)"""
     )
