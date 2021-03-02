@@ -102,12 +102,13 @@ def big_plot_job():
 	if os.path.exists('missing_person.p'):
 		with open('missing_person.p','rb') as f:
 			temp = pickle.load(f)
-		[both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing] = temp
+		[mg,both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing,sirg_author_list] = temp
 
 	else:
+		mg,both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing,sirg_author_list = identify_find_missing()
 		#except:
-		both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing = identify_find_missing()
-		temp = [both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing]
+		#both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing = identify_find_missing()
+		temp = [mg,both_sets_locations,missing_person_name,missing_person_location,both_sets_locations_missing,sirg_author_list]
 		with open('missing_person.p','wb') as f:
 			pickle.dump(temp,f)
 
