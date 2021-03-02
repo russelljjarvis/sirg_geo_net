@@ -90,10 +90,12 @@ def identify_find_missing():
     both_sets_locations_missing = {
         k: v for k, v in both_sets_locations.items() if v[1] is None
     }
-    list_of_dicts = [ v for k,v in both_sets_locations.items()]
+    list_of_dicts = [v for k, v in both_sets_locations.items()]
     df = pd.DataFrame(list_of_dicts)
-    st.dataframe(df)
 
+    ###
+    # st.dataframe(df)
+    ###
     if os.path.exists("retry.p"):
         with open("retry.p", "rb") as f:
             retry = pickle.load(f)
@@ -120,14 +122,16 @@ def identify_find_missing():
                 retry[person_key] = xy
                 check_none = xy[1]
         assert retry is not None
-        #import pprint
-        #pprint.pprint(retry)
+        # import pprint
+        # pprint.pprint(retry)
 
         retry = {k: v for k, v in retry.items() if v[1] is not None}
         both_sets_locations_complete.update(retry)
-        list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+        list_of_dicts = [v for k, v in both_sets_locations_missing.items()]
         df = pd.DataFrame(list_of_dicts)
-        st.dataframe(df)
+        ###
+        # st.dataframe(df)
+        ###
         import copy
 
         with open("retry.p", "wb") as f:
@@ -140,9 +144,9 @@ def identify_find_missing():
         both_sets_locations_complete.update(g_locations)
     except:
         pass
-    #list_of_dicts = [ v for k,v in both_sets_locations.items()]
-    #df = pd.DataFrame(list_of_dicts)
-    #st.dataframe(df)
+    # list_of_dicts = [ v for k,v in both_sets_locations.items()]
+    # df = pd.DataFrame(list_of_dicts)
+    # st.dataframe(df)
 
     both_sets_locations = both_sets_locations_complete
     missing_person_name = list(
@@ -154,9 +158,9 @@ def identify_find_missing():
     both_sets_locations_missing = {
         k: v for k, v in both_sets_locations.items() if v[1] is None
     }
-    #list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
-    #df = pd.DataFrame(list_of_dicts)
-    #st.dataframe(df)
+    # list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+    # df = pd.DataFrame(list_of_dicts)
+    # st.dataframe(df)
     return (
         mg,
         both_sets_locations,
@@ -312,8 +316,8 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     orig_pos = nx.get_node_attributes(second, "pos")
     pos_ = nx.get_node_attributes(graph, "pos")
 
-    if os.path.exists('segments.p'):
-        with open('segments.p','rb') as f:
+    if os.path.exists("segments.p"):
+        with open("segments.p", "rb") as f:
             segments = pickle.load(f)
 
     else:
@@ -349,13 +353,13 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     fig, ax = plt.subplots(figsize=(30, 30))
 
     ax = world.plot(color="white", edgecolor="black", figsize=(40, 40))
-    #for seg in segments:  # [::100]:
-    for ind, seg in enumerate(tqdm(segments,title='Bundling Edges')):
+    # for seg in segments:  # [::100]:
+    for ind, seg in enumerate(tqdm(segments, title="Bundling Edges")):
         ax.plot(seg[:, 0], seg[:, 1])
     assert segments is not None
 
-    with open('segments.p','wb') as f:
-        pickle.dump(segments,f)
+    with open("segments.p", "wb") as f:
+        pickle.dump(segments, f)
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
@@ -379,9 +383,13 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
 
     return fig, ax3, ax3, segments
 
+
 from auxillary_methods import tqdm
 
-def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=None,pos_=None):
+
+def data_bundle_plotly(
+    graph, world, colors, sirg_author_list, tab10, segments=None, pos_=None
+):
     nodes = graph.nodes
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
@@ -391,7 +399,6 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
         pos_ = nx.get_node_attributes(graph, "pos")
 
     assert segments is not None
-
 
     if segments is None:
         coords = []
@@ -430,8 +437,12 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
     lons = []
     traces = []
     other_traces = []
-    st.markdown("""Note only 200 node edges are shown here, because making the full list of {0} edges interactive would take hours""".format(len(segments)))
-    for ind, seg in enumerate(tqdm(segments[::200],title='Bundling Edges')):
+    st.markdown(
+        """Note only 200 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
+            len(segments)
+        )
+    )
+    for ind, seg in enumerate(tqdm(segments[::200], title="Bundling Edges")):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
@@ -478,7 +489,7 @@ def data_bundle_plotly(graph, world, colors, sirg_author_list, tab10, segments=N
         )
     )
     fig.add_traces(other_traces)
-    #layout = fig["layout"]
+    # layout = fig["layout"]
     fig["layout"]["width"] = 825
     fig["layout"]["height"] = 825
     st.write(fig)
@@ -547,28 +558,34 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
         df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude)
     )
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-    fig, ax3, plt_bundled,segments = data_bundle(second, world, colors, sirg_author_list, tab10)
+    fig, ax3, plt_bundled, segments = data_bundle(
+        second, world, colors, sirg_author_list, tab10
+    )
     assert segments is not None
 
     st.markdown(""" Computing an interactive version of this map now.""")
     # In the meantime:
-	#A lot of potential coauthors were excluded
-	#see this list below:
-    #Note sometimes this includes core SIRG authors, where initials are written. For contrast..
-	#"""
-    #)
+    # A lot of potential coauthors were excluded
+    # see this list below:
+    # Note sometimes this includes core SIRG authors, where initials are written. For contrast..
+    # """
+    # )
     missing_person_name = list(
         [k for k, v in both_sets_locations.items() if v[1] is None]
     )
     with open("missing_person_name.p", "rb") as f:
         missing_person_name = pickle.load(f)
 
-    missing_person_name = [name for name in missing_person_name if name not in str("Brian Smith")]
+    missing_person_name = [
+        name for name in missing_person_name if name not in str("Brian Smith")
+    ]
     ds_nodes = pd.DataFrame(missing_person_name, columns=["names"])
-    #st.dataframe(ds_nodes)
+    # st.dataframe(ds_nodes)
     st.markdown("""Okay now making an interactive version of this plot ...""")
     assert segments is not None
-    fig = data_bundle_plotly(second, world, colors, sirg_author_list, tab10, segments=segments)
+    fig = data_bundle_plotly(
+        second, world, colors, sirg_author_list, tab10, segments=segments
+    )
 
     # graph_for_app(pos,second)
     return plt, plt_bundled, ax3

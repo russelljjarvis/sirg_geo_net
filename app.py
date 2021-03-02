@@ -73,7 +73,7 @@ import pickle
 from netgeovis2 import (
     main_plot_routine,
     identify_find_missing,
-    remove_missing_persons_from_big_net
+    remove_missing_persons_from_big_net,
 )
 
 with open("both_sets_locations.p", "rb") as f:
@@ -133,9 +133,8 @@ def big_plot_job():
         with open("missing_person.p", "wb") as f:
             pickle.dump(temp, f)
 
-
-    #both_sets_locations
-    #both_sets_locations.keys()
+    # both_sets_locations
+    # both_sets_locations.keys()
 
     node_positions = list(both_sets_locations.values())
     long_lat = [np[1] for np in node_positions if np[1] is not None]
@@ -159,40 +158,38 @@ def big_plot_job():
     plt_unbundled, plt_bundled, ax3 = main_plot_routine(
         both_sets_locations, missing_person_name, node_location_name
     )
-    #main_plot_routine(both_sets_locations, missing_person_name, node_location_name)
+    # main_plot_routine(both_sets_locations, missing_person_name, node_location_name)
 
 
 from PIL import Image
 
-def main():
 
+def main():
 
     st.markdown("""--------------""")
     st.title(
         """Geo Geographic Maps for whole SIRG network are time intensive to compute."""
     )
-    image = Image.open('bundled_graph_static.png')
+    image = Image.open("bundled_graph_static.png")
 
-    st.image(image, caption='a cached: Bundled Geographic Network map of greater SIRG network',
-              use_column_width=True)
+    st.image(
+        image,
+        caption="a cached: Bundled Geographic Network map of greater SIRG network",
+        use_column_width=False,
+        width=None
+    )
 
+    st.markdown(
+        """Recomputing graphs and making an interactive version in case data was revised. In the meantime we will populate the screen while you wait with other stuff while we re-build them..."""
+    )
 
-    st.markdown("""Recomputing graphs in case data was revised. In the meantime we will populate the screen while you wait with other stuff while we re-build them...""")
-
-
-    identify_find_missing()
+    #identify_find_missing()
     figure_size = 200
     hv.output(size=figure_size)
-
-    #MAIN_AUTHOR = author_name = sirg_author_list[0]
-    #g, df = author_to_coauthor_network(author_name)
-    #fig_pln = plotly_sized(g)
     with open("mega_net.p", "rb") as f:
         mg = pickle.load(f)
 
-    graph = hv.Graph.from_networkx(
-        mg, networkx.layout.fruchterman_reingold_layout
-    )
+    graph = hv.Graph.from_networkx(mg, networkx.layout.fruchterman_reingold_layout)
     graph.opts(
         color_index="circle",
         width=450,
@@ -216,9 +213,9 @@ def main():
             sirg_author_list,
         ] = temp
 
-        #list_of_dicts = [ list(v) for k,v in both_sets_locations_missing.items()]
-        #df = pd.DataFrame(list_of_dicts)
-        #st.dataframe(df)
+        # list_of_dicts = [ list(v) for k,v in both_sets_locations_missing.items()]
+        # df = pd.DataFrame(list_of_dicts)
+        # st.dataframe(df)
 
     label = "Coauthorship Network for whole SIRG network: "
     st.markdown(
@@ -230,19 +227,23 @@ def main():
     # st.markdown("""Geo Geographic Maps computing now, this will take time""")
     st.markdown(
         "<h1 style='text-align: left; color: black;'>"
-        + str("Geographic Maps for whole sirg network computing now, this will take time")
+        + str(
+            "Geographic Maps for whole sirg network computing now, this will take time"
+        )
         + "</h1>",
         unsafe_allow_html=True,
     )
     st.markdown("""geo plots computing...""")
     big_plot_job()
 
-    #st.markdown(
+    # st.markdown(
     #    """[My other science information dashboard app](https://agile-reaches-20338.herokuapp.com/)"""
-    #)
-    #"""
-	#[Source Code:](https://github.com/russelljjarvis/CoauthorNetVis)
-	#"""
+    # )
+    # """
+
+
+# [Source Code:](https://github.com/russelljjarvis/CoauthorNetVis)
+# """
 
 
 if __name__ == "__main__":
