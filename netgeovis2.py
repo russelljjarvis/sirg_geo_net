@@ -123,7 +123,9 @@ def identify_find_missing():
 
         retry = {k: v for k, v in retry.items() if v[1] is not None}
         both_sets_locations_complete.update(retry)
-
+        list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+        df = pd.DataFrame(list_of_dicts)
+        st.dataframe(df)
         import copy
 
         with open("retry.p", "wb") as f:
@@ -150,6 +152,9 @@ def identify_find_missing():
     both_sets_locations_missing = {
         k: v for k, v in both_sets_locations.items() if v[1] is None
     }
+    list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
+    df = pd.DataFrame(list_of_dicts)
+    st.dataframe(df)
     return (
         mg,
         both_sets_locations,

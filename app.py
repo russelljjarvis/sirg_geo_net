@@ -192,7 +192,7 @@ def main():
         """Geo Geographic Maps for whole SIRG network are time intensive to compute, so first we will populate the screen while you wait"""
     )
     st.markdown("""...with other stuff while we build them...""")
-    #identify_find_missing()
+    identify_find_missing()
     figure_size = 200
     hv.output(size=figure_size)
 
@@ -228,9 +228,9 @@ def main():
             sirg_author_list,
         ] = temp
 
-        list_of_dicts = [ v for k,v in both_sets_locations_missing.items()]
-        df = pd.DataFrame(list_of_dicts)
-        st.dataframe(df)
+        #list_of_dicts = [ list(v) for k,v in both_sets_locations_missing.items()]
+        #df = pd.DataFrame(list_of_dicts)
+        #st.dataframe(df)
 
     label = "Coauthorship Network for whole SIRG network: "
     st.markdown(
