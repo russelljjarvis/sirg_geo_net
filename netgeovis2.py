@@ -351,12 +351,12 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
             seg = hbnp[start:stop, :]
             segments.append(seg)
             start = stop
-    fig, ax = plt.subplots(figsize=(30, 30))
+    fig, ax = plt.subplots(figsize=(40, 40))
 
     ax = world.plot(color="white", edgecolor="black", figsize=(40, 40))
     # for seg in segments:  # [::100]:
     for ind, seg in enumerate(tqdm(segments, title="Bundling Edges")):
-        ax.plot(seg[:, 0], seg[:, 1])
+        ax.plot(seg[:, 0], seg[:, 1], linewidth=0.125)
     assert segments is not None
 
     with open("segments.p", "wb") as f:
@@ -364,7 +364,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
-        node_size=35,
+        node_size=55,
         node_color=colors,
         node_shape="o",
         alpha=1.0,
