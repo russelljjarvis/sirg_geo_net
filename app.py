@@ -53,13 +53,13 @@ def user_manual_fix_missing(list_of_dicts):
     st.sidebar.markdown(get_table_download_link_csv(df), unsafe_allow_html=True)
 
 
-def disable_logo(plot, element):
-    plot.state.toolbar.logo = None
+#def disable_logo(plot, element):
+#    plot.state.toolbar.logo = None
 
 
 hv.extension("bokeh", logo=False)
 hv.output(size=300)
-hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
+#hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
 # "Antonin Delpeuch",
 
 import geopandas

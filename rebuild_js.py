@@ -139,6 +139,8 @@ def author_to_gaffiliations(NAME):
         return None
 
 
+'''
+Moved
 def author_to_gh_index(NAME):
     from scholarly import scholarly, ProxyGenerator
 
@@ -149,29 +151,25 @@ def author_to_gh_index(NAME):
     search_query = list(scholarly.search_author(NAME))
     if len(search_query):
         sq = search_query[0]
-
-        # import pdb
-        # pdb.set_trace()
-        # afil = sq['affiliation']
-        # print(afil,"g afil")
         if hasattr(sq, "citedby"):
             return sq["citedby"]
         else:
             return None
     else:
         return None
-        # res_author_search = scholarly.fill(sq)
-        # try:
-        # print(res_author_search)
-        # afil = res_author_search['affiliation']
-        # if len(afil['affiliation']):
-        # 	print(afil['affiliation'],res_author_search['affiliation'])
-        # gaffiliations[key] = afil
-        # print(gaffiliations, "\n\n\n")
-        # res_author_search['affiliation']
 
-        # with open('gaffilations.p','wb') as f:
-        # 	pickle.dump(gaffiliations,f)
+    # res_author_search = scholarly.fill(sq)
+    # try:
+    # print(res_author_search)
+    # afil = res_author_search['affiliation']
+    # if len(afil['affiliation']):
+    # 	print(afil['affiliation'],res_author_search['affiliation'])
+    # gaffiliations[key] = afil
+    # print(gaffiliations, "\n\n\n")
+    # res_author_search['affiliation']
+
+    # with open('gaffilations.p','wb') as f:
+    # 	pickle.dump(gaffiliations,f)
 
     # response = requests.get("https://dissem.in/api/search/?authors=" + str(NAME))
     # author_papers = response.json()
@@ -212,7 +210,7 @@ def author_to_gh_index(NAME):
 
 # print(len(mg.nodes))
 # https://curl.trillworks.com/#python
-
+'''
 """
 plus_initial=NAME['name']['first']
 initial = plus_initial.split(" ")

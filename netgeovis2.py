@@ -10,10 +10,7 @@ import json
 
 from bokeh.io import output_notebook, show, output_file
 from bokeh.plotting import figure
-
-# from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar, NumeralTickFormatter
 from bokeh.palettes import brewer
-
 from bokeh.io.doc import curdoc
 from bokeh.models import Slider, HoverTool, Select
 from bokeh.layouts import widgetbox, row, column
@@ -44,6 +41,7 @@ import os
 import plotly.express as px
 from auxillary_methods import tqdm
 
+import pylab as plot
 
 def rectify_data_sources():
     with open("both_sets_locations.p", "rb") as f:
@@ -174,6 +172,7 @@ def identify_find_missing():
 
 
 # def
+'''
 def test():
     """
     not used
@@ -212,6 +211,7 @@ def test():
     # output_notebook()
     # Display figure.
     show(p)
+'''
 
 
 def remove_missing_persons_from_big_net(both_sets_locations, missing_person_name):
@@ -364,7 +364,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
-        node_size=15,
+        node_size=25,
         node_color=colors,
         node_shape="o",
         alpha=1.0,
@@ -375,8 +375,11 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     )  # , **kwds)
 
     for i, v in enumerate(sirg_author_list):
-        plt.scatter([], [], c=tab10[i], label="SIRG PI {}".format(v))
+        plt.scatter([], [], c=tab10[i], label="SIRG PI {0}".format(v))
     plt.legend()
+    params = {'legend.fontsize': 60}
+    plt.rcParams.update(params)
+    plot.rcParams.update(params)
     plt.savefig("bundled_graph_static.png")
 
     st.pyplot(plt)
@@ -438,11 +441,11 @@ def data_bundle_plotly(
     traces = []
     other_traces = []
     st.markdown(
-        """Note only 150 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
+        """Note only 1001 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
             len(segments)
         )
     )
-    for ind, seg in enumerate(tqdm(segments[::150], title="Bundling Edges")):
+    for ind, seg in enumerate(tqdm(segments[::1000], title="Modifying Edges for Interactivity")):
         x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
         x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
         xx = seg[:, 0]
@@ -457,7 +460,8 @@ def data_bundle_plotly(
                         lat=[yy[i], yy[i - 1]],
                         mode="lines",
                         showlegend=False,
-                        line=dict(width=0.5, color="red"),
+                        hoverinfo='skip',
+                        line=dict(width=0.5, color="blue"),
                     )
                 )
 
@@ -466,21 +470,7 @@ def data_bundle_plotly(
             lat=df_geo["lat"],
             lon=df_geo["lon"],
             marker=dict(
-                size=4,  # data['Confirmed-ref'],
-                color=colors,
-                opacity=1,
-            ),
-            text=list(graph.nodes),
-            hovertemplate="%{text} <extra></extra>",
-        )
-    )
-
-    fig.add_trace(
-        go.Scattergeo(
-            lat=df_geo["lat"],
-            lon=df_geo["lon"],
-            marker=dict(
-                size=4,  # data['Confirmed-ref'],
+                size=8,  # data['Confirmed-ref'],
                 color=colors,
                 opacity=1,
             ),
@@ -490,8 +480,8 @@ def data_bundle_plotly(
     )
     fig.add_traces(other_traces)
     # layout = fig["layout"]
-    fig["layout"]["width"] = 825
-    fig["layout"]["height"] = 825
+    fig["layout"]["width"] = 1825
+    fig["layout"]["height"] = 1825
     st.write(fig)
     return fig
 

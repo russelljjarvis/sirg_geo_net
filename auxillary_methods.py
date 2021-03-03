@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 import numpy as np
-
+from typing import List
 
 def unpaywall_semantic_links(NAME, tns):
     """
@@ -46,7 +46,7 @@ def visit_link(NAME):
         requests.get(link)
     return author_results, visit_urls
 
-
+'''
 def draw_wstate_tree(G):
 
     # from networkx.drawing.nx_agraph import write_dot, graphviz_layout
@@ -60,7 +60,7 @@ def draw_wstate_tree(G):
 
     plt.savefig("whole_net.png")
     st.write(plt.show())
-
+'''
 
 # Custom function to create an edge between node x and node y, with a given text and width
 def make_edge(x, y, text, width):
