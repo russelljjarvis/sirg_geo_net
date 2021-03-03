@@ -364,7 +364,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     ax3 = nx.draw_networkx_nodes(
         graph,
         orig_pos,
-        node_size=25,
+        node_size=35,
         node_color=colors,
         node_shape="o",
         alpha=1.0,
@@ -383,7 +383,6 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     plt.savefig("bundled_graph_static.png")
 
     st.pyplot(plt)
-    # st.pyplot(fig)
 
     return fig, ax3, ax3, segments
 
@@ -464,7 +463,8 @@ def data_bundle_plotly(
                         line=dict(width=0.5, color="blue"),
                     )
                 )
-
+    with open('expensive_plotly_traces.p','wb') as f:
+        pickle.dump(other_traces,f)
     fig.add_trace(
         go.Scattergeo(
             lat=df_geo["lat"],
