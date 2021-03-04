@@ -381,7 +381,9 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     #ax4 = circle( xy, radius, color="lightsteelblue", facecolor="lightsteelblue", alpha=1, ax=ax3 )
 
     ax5 = plt.scatter(-111.93316158417922, 33.42152185, s=580, facecolors='r', edgecolors='r')
-    plt.text(-111.93316158417922, 33.42152185,"ASU")
+    plt.text(-111.93316158417922, 33.42152185,"SIRG \n Arizona State University",size=25)
+
+    #plt.text(-111.93316158417922, 33.42152185,"ASU")
     for i, v in enumerate(sirg_author_list):
         plt.scatter([], [], c=tab10[i], label="SIRG PI {0}".format(v))
     plt.legend()
@@ -390,7 +392,7 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     plot.rcParams.update(params)
     plt.savefig("bundled_graph_static.png")
 
-    st.pyplot(plt)
+    st.pyplot(plt,use_column_width=False,width=None)
 
     return fig, ax3, ax3, segments
 
@@ -617,38 +619,7 @@ def graph_for_app(world,second,edge_colors,colors,sirg_author_list,tab10):
     #fig, ax = plt.subplots(figsize=(40, 40))
 
     ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
-    '''
 
-    pos_core = nx.get_node_attributes(core, "pos")
-    # linewidths ([None | scalar | sequence]) – Line width of symbol border (default =1.0)
-
-    # edgecolors
-    ax4 = nx.draw_networkx_nodes(
-        pos_core,
-        pos,
-        node_size=400,
-        node_color="red",
-        node_shape="o",
-        alpha=0.1,
-        vmin=None,
-        vmax=None,
-        linewidths=None,
-        label=None,
-    )  # , **kwds)
-    ax5 = nx.draw_networkx_nodes(
-        pos_core,
-        pos,
-        linewidths=0.25,
-        edgecolors="red",
-        node_size=400,
-        node_color="white",
-        node_shape="o",
-        alpha=1.0,
-        vmin=None,
-        vmax=None,
-        label=label_core,
-    )  # , **kwds)
-    '''
     pos_all = nx.get_node_attributes(second, "pos")
     # ax1 = nx.draw(second,pos,node_size=21,  node_shape='o', alpha=0.7, edge_color='grey', width=0.1)
     ax2 = nx.draw_networkx_edges(
@@ -679,14 +650,14 @@ def graph_for_app(world,second,edge_colors,colors,sirg_author_list,tab10):
     )  # , **kwds)
     ax6 = plt.scatter(-111.93316158417922,33.42152185, s=480, facecolors='r', edgecolors='r')
     plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
-    bbox_props = dict(boxstyle="rarrow,pad=0.3", fc="cyan", ec="b", lw=2)
-    plt.text(-111.93316158417922, 33.42152185, "Arizona State University", ha="center", va="center", rotation=45,
-                size=25,
-                bbox=bbox_props)
+    #bbox_props = dict(boxstyle="rarrow,pad=0.3", fc="cyan", ec="b", lw=2)
+    #plt.text(-111.93316158417922, 33.42152185, "Arizona State University", ha="center", va="center", rotation=45,
+    #            size=25,
+    #            bbox=bbox_props)
     for i, v in enumerate(sirg_author_list):
         plt.scatter([], [], c=tab10[i], label="SIRG PI {}".format(v))
     plt.legend()
-    st.pyplot(plt)
+    st.pyplot(plt,use_column_width=False,width=None)
 
 '''
 
