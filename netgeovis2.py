@@ -316,8 +316,8 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
     pos_ = nx.get_node_attributes(graph, "pos")
-
-    if os.path.exists("segments.p"):
+    if False:
+        #if os.path.exists("segments.p"):
         with open("segments.p", "rb") as f:
             segments = pickle.load(f)
 
@@ -373,11 +373,19 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
         linewidths=None,
         label=None,
     )  # , **kwds)
+    xy = (33.42152185,-111.93316158417922)
+    radius = 50
+    #ax4 = circle( xy, radius, color="lightsteelblue", facecolor="lightsteelblue", alpha=1, ax=ax3 )
+    #xy = (-111.93316158417922,33.42152185,)
 
+    #ax4 = circle( xy, radius, color="lightsteelblue", facecolor="lightsteelblue", alpha=1, ax=ax3 )
+
+    ax5 = plt.scatter(-111.93316158417922, 33.42152185, s=580, facecolors='r', edgecolors='r')
+    plt.text(-111.93316158417922, 33.42152185,"ASU")
     for i, v in enumerate(sirg_author_list):
         plt.scatter([], [], c=tab10[i], label="SIRG PI {0}".format(v))
     plt.legend()
-    params = {'legend.fontsize': 60}
+    params = {'legend.fontsize': 25}
     plt.rcParams.update(params)
     plot.rcParams.update(params)
     plt.savefig("bundled_graph_static.png")
@@ -470,7 +478,7 @@ def data_bundle_plotly(
             lat=df_geo["lat"],
             lon=df_geo["lon"],
             marker=dict(
-                size=8,  # data['Confirmed-ref'],
+                size=15,  # data['Confirmed-ref'],
                 color=colors,
                 opacity=1,
             ),
@@ -548,6 +556,13 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
         df, geometry=geopandas.points_from_xy(df.Longitude, df.Latitude)
     )
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
+
+    graph_for_app(world,second,edge_colors,colors,sirg_author_list,tab10)
+
+    fig, ax3, plt_bundled, segments = data_bundle(
+        second, world, colors, sirg_author_list, tab10
+    )
+
     fig, ax3, plt_bundled, segments = data_bundle(
         second, world, colors, sirg_author_list, tab10
     )
@@ -579,14 +594,31 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
 
     # graph_for_app(pos,second)
     return plt, plt_bundled, ax3
+'''
 
-
-def graph_for_app(pos, second):
-    core = nx.k_core(second, 98)
-    label_core = core.nodes  # nx.nodes(core,'labels')
+from matplotlib.patches import Circle  # $matplotlib/patches.py
+def circle( xy, radius, color="lightsteelblue", facecolor="none", alpha=1, ax=None ):
+    """ add a circle to ax= or current axes
+    """
+        # from .../pylab_examples/ellipse_demo.py
+    e = Circle( xy=xy, radius=radius )
+    ax.add_artist(e)
+    e.set_clip_box(ax.bbox)
+    e.set_edgecolor( color )
+    e.set_facecolor( facecolor )  # "none" not None
+    e.set_alpha( alpha )
+    return ax
+'''
+def graph_for_app(world,second,edge_colors,colors,sirg_author_list,tab10):
+    #core = nx.k_core(second, 98)
+    #label_core = core.nodes  # nx.nodes(core,'labels')
     # fig = plt.figure()#frameon=False,figsize=(20,20))
+    pos = nx.get_node_attributes(second, "pos")
+    #fig, ax = plt.subplots(figsize=(40, 40))
 
-    ax = world.plot(color="white", edgecolor="black", figsize=(20, 20))
+    ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
+    '''
+
     pos_core = nx.get_node_attributes(core, "pos")
     # linewidths ([None | scalar | sequence]) – Line width of symbol border (default =1.0)
 
@@ -616,16 +648,16 @@ def graph_for_app(pos, second):
         vmax=None,
         label=label_core,
     )  # , **kwds)
-
+    '''
     pos_all = nx.get_node_attributes(second, "pos")
     # ax1 = nx.draw(second,pos,node_size=21,  node_shape='o', alpha=0.7, edge_color='grey', width=0.1)
     ax2 = nx.draw_networkx_edges(
         second,
         pos_all,
-        width=0.15,
+        width=0.05,
         edge_color=edge_colors,
         style="solid",
-        alpha=0.15,
+        alpha=0.05,
         ax=ax,
         edge_vmin=None,
         edge_vmax=None,
@@ -645,109 +677,18 @@ def graph_for_app(pos, second):
         linewidths=None,
         label=None,
     )  # , **kwds)
-
-    # ax1 = nx.draw(core,pos,node_size=40, node_shape='o', alpha=0.7, edge_color='grey', width=0.1)
-    # for i,v in enumerate(author_list):
-    #    plt.scatter([],[], c=tab10[i], label='SIRG PI {}'.format(v))
-    # plt.legend()
-    # plt.show()
-    st.pyplot(plt)
-    # core=nx.k_shell(second,0)
-
-    fig = plt.figure()
-
-    ax = world.plot(color="white", edgecolor="black", figsize=(20, 20))
-    pos = nx.get_node_attributes(core, "pos")
-
-    ax1 = nx.draw(
-        core, pos, node_size=21, node_shape="o", alpha=0.7, edge_color="grey", width=0.1
-    )
-    for i, v in enumerate(author_list):
+    ax6 = plt.scatter(-111.93316158417922,33.42152185, s=480, facecolors='r', edgecolors='r')
+    plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
+    bbox_props = dict(boxstyle="rarrow,pad=0.3", fc="cyan", ec="b", lw=2)
+    plt.text(-111.93316158417922, 33.42152185, "Arizona State University", ha="center", va="center", rotation=45,
+                size=25,
+                bbox=bbox_props)
+    for i, v in enumerate(sirg_author_list):
         plt.scatter([], [], c=tab10[i], label="SIRG PI {}".format(v))
     plt.legend()
-    plt.show()
     st.pyplot(plt)
 
-
-def graph_for_app(pos, second):
-    core = nx.k_core(second, 98)
-    label_core = core.nodes  # nx.nodes(core,'labels')
-    # fig = plt.figure()#frameon=False,figsize=(20,20))
-
-    ax = world.plot(color="white", edgecolor="black", figsize=(20, 20))
-    pos_core = nx.get_node_attributes(core, "pos")
-    # linewidths ([None | scalar | sequence]) – Line width of symbol border (default =1.0)
-
-    # edgecolors
-    ax4 = nx.draw_networkx_nodes(
-        pos_core,
-        pos,
-        node_size=400,
-        node_color="red",
-        node_shape="o",
-        alpha=0.1,
-        vmin=None,
-        vmax=None,
-        linewidths=None,
-        label=None,
-    )  # , **kwds)
-    ax5 = nx.draw_networkx_nodes(
-        pos_core,
-        pos,
-        linewidths=0.25,
-        edgecolors="red",
-        node_size=400,
-        node_color="white",
-        node_shape="o",
-        alpha=1.0,
-        vmin=None,
-        vmax=None,
-        label=label_core,
-    )  # , **kwds)
-
-    pos_all = nx.get_node_attributes(second, "pos")
-    # ax1 = nx.draw(second,pos,node_size=21,  node_shape='o', alpha=0.7, edge_color='grey', width=0.1)
-    ax2 = nx.draw_networkx_edges(
-        second,
-        pos_all,
-        width=0.15,
-        edge_color=edge_colors,
-        style="solid",
-        alpha=0.15,
-        ax=ax,
-        edge_vmin=None,
-        edge_vmax=None,
-        arrows=True,
-        label=None,
-    )  # , **kwds)
-
-    ax3 = nx.draw_networkx_nodes(
-        second,
-        pos_all,
-        node_size=21,
-        node_color=colors,
-        node_shape="o",
-        alpha=1.0,
-        vmin=None,
-        vmax=None,
-        linewidths=None,
-        label=None,
-    )  # , **kwds)
-    st.pyplot(plt)
-    fig = plt.figure()
-
-    ax = world.plot(color="white", edgecolor="black", figsize=(20, 20))
-    pos = nx.get_node_attributes(core, "pos")
-
-    ax1 = nx.draw(
-        core, pos, node_size=21, node_shape="o", alpha=0.7, edge_color="grey", width=0.1
-    )
-    for i, v in enumerate(author_list):
-        plt.scatter([], [], c=tab10[i], label="SIRG PI {}".format(v))
-    plt.legend()
-    plt.show()
-    st.pyplot(plt)
-
+'''
 
 def left_over():
     for node in G.nodes:
@@ -779,3 +720,4 @@ def left_over():
     ax = world.plot(color="white", edgecolor="black")  # ,figsize=(16,12))
 
     gdf.plot(ax=ax, color="red")
+'''

@@ -338,22 +338,6 @@ def push_frame_to_screen(df_links):
     st.write(df_links, unsafe_allow_html=True)
 
 
-def get_cluster_id(url):
-    """
-    Google assign a cluster identifier to a group of web documents
-    that appear to be the same publication in different places on the web.
-    How they do this is a bit of a mystery, but this identifier is
-    important since it uniquely identifies the publication.
-    """
-    vals = parse_qs(urlparse(url).query).get("cluster", [])
-    if len(vals) == 1:
-        return vals[0]
-    else:
-        vals = parse_qs(urlparse(url).query).get("cites", [])
-        print(vals)
-        if len(vals) == 1:
-            return vals[0]
-    return None
 
 
 def author_to_urls(NAME):

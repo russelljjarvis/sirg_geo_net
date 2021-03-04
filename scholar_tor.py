@@ -90,6 +90,32 @@ except:
         gad[name] = author_to_gaffiliations(name)
         with open("update_googl_big_job.p", "wb") as f:
             pickle.dump(gad, f)
+def get_stuff():
+    with open("mega_net.p", "rb") as f:
+        mg = pickle.load(f)
+    g_locations = {}
+    citedbyd = {}
+
+    sirg_author_list = [
+        "Brian H Smith",
+        "Christian Rabeling",
+        "Jon F Harrison",
+        "Juergen Liebig",
+        "Stephen C Pratt",
+        "Jennifer H Fewell",
+        "Arianne J Cease",
+        "Gro V Amdam",
+    ]
+    #for name, institution in gad.items():
+    for name in sirg_author_list:#mg.nodes:
+        citedby,hi = author_to_gh_index(name)
+        citedbyd[name] = hi
+        print('hi {0}'.format(hi))
+        with open("sirg_hindex_g_locations.p", "wb") as f:
+            pickle.dump(citedbyd, f)
+    sirg = pickle.load(open("sirg_hindex_g_locations.p","rb"))
+    print(sirg)
+            
 '''
 if os.path.exists("big_g_locations.p"):
     try:
@@ -137,27 +163,3 @@ if os.path.exists("big_g_locations.p"):
     with open("big_g_locations.p", "wb") as f:
         pickle.dump(g_locations, f)
 '''
-with open("mega_net.p", "rb") as f:
-    mg = pickle.load(f)
-g_locations = {}
-citedbyd = {}
-
-sirg_author_list = [
-    "Brian H Smith",
-    "Christian Rabeling",
-    "Jon F Harrison",
-    "Juergen Liebig",
-    "Stephen C Pratt",
-    "Jennifer H Fewell",
-    "Arianne J Cease",
-    "Gro V Amdam",
-]
-#for name, institution in gad.items():
-for name in sirg_author_list:#mg.nodes:
-    citedby,hi = author_to_gh_index(name)
-    citedbyd[name] = hi
-    print('hi {0}'.format(hi))
-    with open("sirg_hindex_g_locations.p", "wb") as f:
-        pickle.dump(citedbyd, f)
-sirg = pickle.load(open("sirg_hindex_g_locations.p","rb"))
-print(sirg)
