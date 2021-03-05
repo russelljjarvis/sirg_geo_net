@@ -12,7 +12,7 @@ import streamlit as st
 from holoviews import opts, dim
 from collections import Iterable
 import networkx
-import bokeh_chart
+#import bokeh_chart
 
 from auxillary_methods import author_to_coauthor_network, network  # ,try_again
 import holoviews as hv
@@ -188,11 +188,11 @@ def main():
     )
 
     #identify_find_missing()
-    figure_size = 100
-    hv.output(size=figure_size)
+
     with open("mega_net.p", "rb") as f:
         mg = pickle.load(f)
-
+    figure_size = 100
+    hv.output(size=figure_size)
     graph = hv.Graph.from_networkx(mg, networkx.layout.fruchterman_reingold_layout)
     graph.opts(
         color_index="circle",
