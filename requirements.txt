@@ -16,7 +16,6 @@ networkx
 pyviz
 holoviews
 bokeh
-bokeh_chart
 js2py
 xarray
 datashader
