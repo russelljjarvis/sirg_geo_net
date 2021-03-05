@@ -171,14 +171,14 @@ def main():
     st.title(
         """Geo Geographic Maps for whole SIRG network are time intensive to compute."""
     )
-    #image = Image.open("bundled_graph_static.png")
-    #st.markdown(
-    #        """Big image try scrolling down..."""
-    #)
+    image = Image.open("bundled_graph_static.png")
+    st.markdown(
+            """Big image try scrolling down..."""
+    )
 
-    #st.image(
-    #    image,
-    #    caption="a cached: Bundled Geographic Network map of greater SIRG network",
+    st.image(
+        image,
+        caption="a cached: Bundled Geographic Network map of greater SIRG network")
     #    use_column_width=False,
     #    width=None
     #)
