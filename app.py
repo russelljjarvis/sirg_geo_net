@@ -12,6 +12,7 @@ import streamlit as st
 from holoviews import opts, dim
 from collections import Iterable
 import networkx
+import bokeh_chart
 
 from auxillary_methods import author_to_coauthor_network, network  # ,try_again
 import holoviews as hv
@@ -170,24 +171,24 @@ def main():
     st.title(
         """Geo Geographic Maps for whole SIRG network are time intensive to compute."""
     )
-    image = Image.open("bundled_graph_static.png")
-    st.markdown(
-        """Big image try scrolling down..."""
-    )
+    #image = Image.open("bundled_graph_static.png")
+    #st.markdown(
+    #        """Big image try scrolling down..."""
+    #)
 
-    st.image(
-        image,
-        caption="a cached: Bundled Geographic Network map of greater SIRG network",
-        use_column_width=False,
-        width=None
-    )
+    #st.image(
+    #    image,
+    #    caption="a cached: Bundled Geographic Network map of greater SIRG network",
+    #    use_column_width=False,
+    #    width=None
+    #)
 
     st.markdown(
         """Recomputing graphs and making an interactive version in case data was revised. In the meantime we will populate the screen while you wait with other stuff while we re-build them..."""
     )
 
     #identify_find_missing()
-    figure_size = 200
+    figure_size = 100
     hv.output(size=figure_size)
     with open("mega_net.p", "rb") as f:
         mg = pickle.load(f)
