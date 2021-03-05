@@ -15,7 +15,7 @@ pipenv
 networkx
 pyviz
 holoviews
-bokeh==1.4.0
+bokeh
 js2py
 xarray
 datashader
