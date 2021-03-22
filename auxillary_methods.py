@@ -1,3 +1,7 @@
+import semanticscholar as sch
+import pprint
+pprint = pprint.pprint
+
 import matplotlib
 from typing import Any, Dict, List, Optional, Tuple, Type, Union, Text
 import requests
@@ -17,20 +21,20 @@ import networkx as nx
 
 import numpy as np
 from typing import List
-
+'''
 def unpaywall_semantic_links(NAME, tns):
     """
     inputs a URL that's full of publication orientated links, preferably the
     authors scholar page.
     """
-    dois, coauthors, titles, visit_urls = author_to_urls(NAME)
+    dois, coauthors, titles = author_to_urls(NAME)
     visit_more_urls = []
     for index, doi_ in enumerate(tqdm(dois, title="Building Suitable Links")):
         r0 = str("https://api.semanticscholar.org/") + str(doi_)
         visit_more_urls.append(r0)
     return visit_more_urls
-
-
+'''
+'''
 def visit_link(NAME):
     """
     inputs a URL that's full of publication orientated links, preferably the
@@ -38,7 +42,7 @@ def visit_link(NAME):
     """
     more_links = {}
     author_results = []
-    dois, coauthors, titles, visit_urls = author_to_urls(NAME)
+    dois, coauthors, titles = author_to_urls(NAME)
     visit_urls.extend(more_links)
     for index, link in enumerate(
         tqdm(visit_urls, title="Text mining via API calls. Please wait.")
@@ -60,7 +64,7 @@ def draw_wstate_tree(G):
 
     plt.savefig("whole_net.png")
     st.write(plt.show())
-'''
+
 
 # Custom function to create an edge between node x and node y, with a given text and width
 def make_edge(x, y, text, width):
@@ -291,6 +295,121 @@ def network(coauthors, MAIN_AUTHOR):
                     g.add_edge(keyi, keyj, weight=node_strengths[keyi])
     return g
 
+def resolve_aliases_and_papers(paper, NAME):
+    if "authors" in paper.keys():
+        for author_ in paper["authors"]:
+            if NAME in author_:
+                if "aliases" in author_.keys():
+                    aliases = author_["aliases"]
+    return aliases
+
+def semantic_scholar_alias(NAME):
+    """
+    inputs a URL that's full of publication orientated links, preferably the
+    authors scholar page.
+    """
+
+    author_results = []
+    aliases = None
+    dois, coauthors, titles = author_to_urls(NAME)
+    #alias_dict = {}
+    inv_alias_dict = {}
+    velocity = {}
+    for d in dois:
+        paper = sch.paper(d, timeout=32)
+        if 'authors' in paper.keys():
+            all_coauthors = paper['authors']
+            for co_name in all_coauthors:
+                key = co_name["name"]
+
+                author = sch.author(co_name['authorId'], timeout=32)
+
+                if "aliases" in author.keys():
+                    aliases = author["aliases"]
+                    for a in aliases:
+                        inv_alias_dict[a] = key
+                pprint(inv_alias_dict)
+                if not key in inv_alias_dict.keys():
+                    inv_alias_dict[key] = key
+                if "citationVelocity" in author.keys():
+                    velocity[key] = author['citationVelocity']
+    inv_alias_dict = {v:k for k,v in inv_alias_dict.items()}
+    return inv_alias_dict,velocity
+
+def specific_sirg_network(coauthors, MAIN_AUTHOR, sirg_author_list):
+    '''
+    Ensures main sirg authors are captured.
+
+    '''
+
+    init_alias_dict = {}
+    for name in sirg_author_list:
+        try:
+            with open(str(name)+'_alias_dict.p','rb') as f:
+                [init_alias_dict,velocity] = pickle.load(f)
+        except:
+            inv_alias_dict,velocity = semantic_scholar_alias(name)
+            init_alias_dict.update(inv_alias_dict)
+            with open(str(name)+'_alias_dict.p','wb') as f:
+                pickle.dump([init_alias_dict,velocity],f)
+    node_strengths = {}
+    cnt = 0
+    titles = {}
+    for title, mini_net in coauthors:
+        for names in mini_net:
+            #resolve_aliases_and_papers(paper, NAME)
+            key = names["name"]["first"] + str(" ") + names["name"]["last"]
+            if key not in node_strengths.keys():
+                node_strengths[key] = 1
+            else:
+                node_strengths[key] += 1
+            cnt += 1
+    g = networkx.DiGraph()
+    sirg_core = networkx.DiGraph()
+    for aut_name in sirg_author_list:
+        g.add_node(aut_name, label=aut_name)#, size=node_strengths[key])
+    inspect_aut = {}
+
+    # for key,value in node_strengths.items():
+    #
+
+    for title, mini_net in coauthors:
+        for names in mini_net:
+            key = names["name"]["first"] + str(" ") + names["name"]["last"]
+            g.add_node(key, label=key, size=node_strengths[key])
+
+
+    for title, mini_net in coauthors:
+
+        # build small worlds
+        # from projection
+        for i, namesi in enumerate(mini_net):
+            keyi = namesi["name"]["first"] + str(" ") + namesi["name"]["last"]
+            # to projection
+            if keyi in sirg_author_list and keyi not in MAIN_AUTHOR:
+                print('within sirg collaboration', keyi,MAIN_AUTHOR)
+                print(keyi)
+
+            for j, namesj in enumerate(mini_net):
+                keyj = namesj["name"]["first"] + str(" ") + namesj["name"]["last"]
+                #if i != j:
+                #if keyi in MAIN_AUTHOR:
+                #    print(keyi)
+                #if keyi == keyj:
+                #    print(keyi,keyj)
+                if keyj in sirg_author_list and keyj not in MAIN_AUTHOR:
+                    print('within sirg collaboration', keyi,MAIN_AUTHOR)
+                    print(keyi,MAIN_AUTHOR,keyj)
+
+                if keyi!=keyj:
+                    g.add_edge(keyi, keyj)
+                    if keyi not in MAIN_AUTHOR:
+                        inspect_aut[keyi] =  keyj
+    #import pprint;pprint.pprint(inspect_aut)
+    #import pdb
+    #pdb.set_trace()
+    return g,sirg_core,init_alias_dict
+
 
 def make_clickable(link):
     # target _blank to open new window
@@ -299,8 +418,8 @@ def make_clickable(link):
     return f'<a target="_blank" href="{link}">{text}</a>'
 
 
-def author_to_coauthor_network(name: str = "") -> networkx.DiGraph():
-    response = requests.get("https://dissem.in/api/search/?authors=" + str(name))
+def author_to_coauthor_network(auth_name: str = "") -> networkx.DiGraph():
+    response = requests.get("https://dissem.in/api/search/?authors=" + str(auth_name))
     author_papers = response.json()
     coauthors = []
     titles = []
@@ -324,12 +443,29 @@ def author_to_coauthor_network(name: str = "") -> networkx.DiGraph():
         list_of_dicts.append(temp)
     df = pd.DataFrame(list_of_dicts)
 
-    with open(str(name) + "_df.p", "wb") as f:
+    with open(str(auth_name) + "_df.p", "wb") as f:
         pickle.dump(df, f)
 
-    g = network(coauthors, name)
+    g = network(coauthors, auth_name)
     return g, df
 
+
+def author_to_sirg_only_network(auth_name: str = "",sirg_author_list: List = []) -> networkx.DiGraph():
+    response = requests.get("https://dissem.in/api/search/?authors=" + str(auth_name))
+    author_papers = response.json()
+    coauthors = []
+    titles = []
+    list_of_dicts = []
+    for p in author_papers["papers"]:
+        coauthors_ = p["authors"]
+        title = p["title"]
+        titles.append(title)
+
+        #coauthors.append(coauthors_)
+        coauthors.append((title, coauthors_))
+
+    g = specific_sirg_network(coauthors, auth_name,sirg_author_list)
+    return g
 
 def push_frame_to_screen(df_links):
     df_links.drop_duplicates(subset="Web_Link", inplace=True)

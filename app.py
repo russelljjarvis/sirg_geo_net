@@ -17,8 +17,8 @@ import networkx
 from auxillary_methods import author_to_coauthor_network, network  # ,try_again
 import holoviews as hv
 from auxillary_methods import (
-    push_frame_to_screen,
-    plotly_sized,
+    push_frame_to_screen#,
+    #plotly_sized,
 )  # , data_shade, draw_wstate_tree
 import chord2
 import shelve
@@ -156,7 +156,7 @@ def big_plot_job():
 
         except:
             pass
-    plt_unbundled, plt_bundled, ax3 = main_plot_routine(
+    plt_unbundled, plt_bundled, ax3,second = main_plot_routine(
         both_sets_locations, missing_person_name, node_location_name
     )
     # main_plot_routine(both_sets_locations, missing_person_name, node_location_name)

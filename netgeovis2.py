@@ -287,31 +287,68 @@ def holoviews_bundle(mg):
     )
 
 
-def recalculate_sirg_db():
-    db = {}
-    for k in author_list:
+def recalculate_sirg_db(sirg_author_list):
+    sn={}
+    for k in sirg_author_list:
         g, df = author_to_coauthor_network(k)
-        db[k] = {}
-        db[k]["g"] = g
-        with open("brute_pickle.p", "wb") as f:
-            pickle.dump(db, f)
-    return db
+        sn[k] = g
+    for name in sirg_author_list:
+        assert name in sn.keys()
+    with open("subnets_pickle.p", "wb") as f:
+        pickle.dump(sn, f)
+
+    return sn
 
 
-def recalculate_sirg_sub_nets():
-
-    with open("brute_pickle.p", "rb") as f:
-        subnets = pickle.load(f)
+def recalculate_sirg_sub_nets(sirg_author_list):
+    subnets = recalculate_sirg_db(sirg_author_list)
+    #with open("subnets_pickle.p", "rb") as f:
+    #    subnets = pickle.load(f)
+    for name in sirg_author_list:
+        assert name in subnets.keys()
     to_mega_net = list(subnets.values())
     for i, mn in enumerate(to_mega_net):
         if i == 0:
-            megnet = mn["g"]
+            megnet = mn
         else:
-            megnet = nx.compose(megnet, mn["g"])
+            megnet = nx.compose(megnet, mn)
+
+    re_sirg_author_list = [
+        "Brian H. Smith",
+        "Christian Rabeling",
+        "Jon F. Harrison",
+        "Juergen Liebig",
+        "Stephen C. Pratt",
+        "Jennifer H. Fewell",
+        "Arianne J. Cease",
+        "Gro V. Amdam",
+    ]
+    sirg_author_list.extend(re_sirg_author_list)
+    #k = second.subgraph(sirg_author_list)
+    pos = nx.spring_layout(megnet)  #setting the positions with respect to G, not k.
+    plt.figure()
+    H_new = nx.DiGraph()
+    for sa in sirg_author_list:
+        to_mega_net = list(subnets.values())
+        for i, mn in enumerate(to_mega_net):
+            for edge in mn.edges:
+                if edge[0] in sa:
+                    if edge[0] not in H_new.nodes:
+                        H_new.add_node(edge[0])
+                    if edge[1] in sa:
+                        H_new.add_edge((edge[0],edge[1]))
+                        print((edge[0],edge[1]))
+
+    nx.draw_networkx(H_new, pos=pos)
+    plt.show()
+
     return subnets, megnet
 
+#import networkx as nx
+#import networkx as nx
+#from matplotlib import pylab as plt
 
-def data_bundle(graph, world, colors, sirg_author_list, tab10):
+def edge_bundle(graph, world, colors, sirg_author_list, tab10,streamlit=False):
     nodes = graph.nodes
     second = graph
     orig_pos = nx.get_node_attributes(second, "pos")
@@ -390,17 +427,26 @@ def data_bundle(graph, world, colors, sirg_author_list, tab10):
     params = {'legend.fontsize': 25}
     plt.rcParams.update(params)
     plot.rcParams.update(params)
-    plt.savefig("bundled_graph_static.png")
+    #plt.savefig, bbox_inches="tight")
 
-    st.pyplot(plt,use_column_width=False,width=None)
+    plt.savefig("bundled_graph_static.png", bbox_inches="tight")
+    if streamlit:
+        st.pyplot(plt,use_column_width=False,width=None)
+
+
+
+    #G = nx.karate_club_graph()
+                                  #just to demonstrate that G.subgraph is okay
+                                  #with nodes not in G.
 
     return fig, ax3, ax3, segments
 
 
 
 
-def data_bundle_plotly(
-    graph, world, colors, sirg_author_list, tab10, segments=None, pos_=None
+def edge_bundle_plotly(
+    graph, world, colors, sirg_author_list, tab10, segments=None, pos_=None,
+    streamlit=False, just_nodes= True
 ):
     nodes = graph.nodes
     second = graph
@@ -410,38 +456,41 @@ def data_bundle_plotly(
     if pos_ is None:
         pos_ = nx.get_node_attributes(graph, "pos")
 
-    assert segments is not None
+    #assert segments is not None
 
-    if segments is None:
-        coords = []
-        for node in graph.nodes:
-            x, y = pos_[node]
-            coords.append((x, y))
-        nodes_py = [
-            [new_name, pos[0], pos[1]]
-            for name, pos, new_name in zip(nodes, coords, nodes_ind)
-        ]
-        ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
+    #if segments is None:
+    coords = []
+    for node in graph.nodes:
+        x, y = pos_[node]
+        coords.append((x, y))
+    nodes_py = [
+        [new_name, pos[0], pos[1]]
+        for name, pos, new_name in zip(nodes, coords, nodes_ind)
+    ]
+    ds_nodes = pd.DataFrame(nodes_py, columns=["name", "x", "y"])
 
-        ds_edges_py = []
-        for (n0, n1) in graph.edges:
-            ds_edges_py.append([redo[n0], redo[n1]])
+    ds_edges_py = []
+    for (n0, n1) in graph.edges:
+        ds_edges_py.append([redo[n0], redo[n1]])
 
-        ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
+    ds_edges = pd.DataFrame(ds_edges_py, columns=["source", "target"])
 
-        hb = hammer_bundle(ds_nodes, ds_edges)
-        hbnp = hb.to_numpy()
-        splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
-        start = 0
+    hb = hammer_bundle(ds_nodes, ds_edges)
+    hbnp = hb.to_numpy()
+    splits = (np.isnan(hbnp[:, 0])).nonzero()[0]
+    start = 0
 
-        segments = []
-        for stop in splits:
-            seg = hbnp[start:stop, :]
-            segments.append(seg)
-            start = stop
+    segments = []
+    for stop in splits:
+        seg = hbnp[start:stop, :]
+        segments.append(seg)
+        start = stop
     df_geo = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
     df_geo["lat"] = [i[1] for i in pos_.values()]
     df_geo["lon"] = [i[0] for i in pos_.values()]
+    for name in graph.nodes:
+        assert name in sirg_author_list
+        #    print(name)
     df_geo["text"] = list(node for node in graph.nodes)
 
     fig = go.Figure()
@@ -449,38 +498,42 @@ def data_bundle_plotly(
     lons = []
     traces = []
     other_traces = []
-    st.markdown(
-        """Note only 1001 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
-            len(segments)
+    if streamlit:
+        st.markdown(
+            """Note only 1001 node edges are shown in interactive plot below, because making the full list of {0} edges interactive would take hours""".format(
+                len(segments)
+            )
         )
-    )
-    for ind, seg in enumerate(tqdm(segments[::1000], title="Modifying Edges for Interactivity")):
-        x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
-        x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
-        xx = seg[:, 0]
-        yy = seg[:, 1]
-        lats.append(xx)
-        lons.append(yy)
-        for i, j in enumerate(xx):
-            if i > 0:
-                other_traces.append(
-                    go.Scattergeo(
-                        lon=[xx[i], xx[i - 1]],
-                        lat=[yy[i], yy[i - 1]],
-                        mode="lines",
-                        showlegend=False,
-                        hoverinfo='skip',
-                        line=dict(width=0.5, color="blue"),
+    if not just_nodes:
+        for ind, seg in enumerate(tqdm(segments, title="Modifying Edges for Interactivity")):
+            x0, y0 = seg[1, 0], seg[1, 1]  # graph.nodes[edge[0]]['pos']
+            x1, y1 = seg[-1, 0], seg[-1, 1]  # graph.nodes[edge[1]]['pos']
+            xx = seg[:, 0]
+            yy = seg[:, 1]
+            lats.append(xx)
+            lons.append(yy)
+            for i, j in enumerate(xx):
+                if i > 0:
+                    other_traces.append(
+                        go.Scattergeo(
+                            lon=[xx[i], xx[i - 1]],
+                            lat=[yy[i], yy[i - 1]],
+                            mode="lines",
+                            showlegend=False,
+                            hoverinfo='skip',
+                            line=dict(width=0.5, color="blue"),
+                        )
                     )
-                )
-    with open('expensive_plotly_traces.p','wb') as f:
-        pickle.dump(other_traces,f)
+        fig.add_traces(other_traces)
+
+    #with open('expensive_plotly_traces.p','wb') as f:
+    #    pickle.dump(other_traces,f)
     fig.add_trace(
         go.Scattergeo(
             lat=df_geo["lat"],
             lon=df_geo["lon"],
             marker=dict(
-                size=15,  # data['Confirmed-ref'],
+                size=3,  # data['Confirmed-ref'],
                 color=colors,
                 opacity=1,
             ),
@@ -488,12 +541,12 @@ def data_bundle_plotly(
             hovertemplate="%{text} <extra></extra>",
         )
     )
-    fig.add_traces(other_traces)
     # layout = fig["layout"]
-    fig["layout"]["width"] = 1825
-    fig["layout"]["height"] = 1825
-    st.write(fig)
-    return fig
+    if streamlit:
+        fig["layout"]["width"] = 1825
+        fig["layout"]["height"] = 1825
+        st.write(fig)
+    return fig,colors
 
 
 def main_plot_routine(both_sets_locations, missing_person_name, node_location_name):
@@ -534,6 +587,9 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
         ]
         with open("net_cache.p", "wb") as f:
             pickle.dump(temp, f)
+#second
+    for name in sirg_author_list:
+        second.add_node(name, pos=(second.nodes['Romain A. Dahan']['pos'][0], second.nodes['Romain A. Dahan']['pos'][1]))
 
     tab10 = sns.color_palette("bright")
     subnets = OrderedDict({k: v["g"] for k, v in subnets.items() if hasattr(v, "keys")})
@@ -561,16 +617,16 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
 
     graph_for_app(world,second,edge_colors,colors,sirg_author_list,tab10)
 
-    fig, ax3, plt_bundled, segments = data_bundle(
+    fig, ax3, plt_bundled, segments = edge_bundle(
         second, world, colors, sirg_author_list, tab10
     )
 
-    fig, ax3, plt_bundled, segments = data_bundle(
-        second, world, colors, sirg_author_list, tab10
-    )
+    #fig, ax3, plt_bundled, segments = edge_bundle(
+    #    second, world, colors, sirg_author_list, tab10
+    #)
     assert segments is not None
-
-    st.markdown(""" Computing an interactive version of this map now.""")
+    if plotly:
+        st.markdown(""" Computing an interactive version of this map now.""")
     # In the meantime:
     # A lot of potential coauthors were excluded
     # see this list below:
@@ -590,12 +646,12 @@ def main_plot_routine(both_sets_locations, missing_person_name, node_location_na
     # st.dataframe(ds_nodes)
     st.markdown("""Okay now making an interactive version of this plot ...""")
     assert segments is not None
-    fig = data_bundle_plotly(
+    fig = edge_bundle_plotly(
         second, world, colors, sirg_author_list, tab10, segments=segments
     )
 
     # graph_for_app(pos,second)
-    return plt, plt_bundled, ax3
+    return plt, plt_bundled, ax3, fig
 '''
 
 from matplotlib.patches import Circle  # $matplotlib/patches.py
@@ -658,6 +714,7 @@ def graph_for_app(world,second,edge_colors,colors,sirg_author_list,tab10):
         plt.scatter([], [], c=tab10[i], label="SIRG PI {}".format(v))
     plt.legend()
     st.pyplot(plt,use_column_width=False,width=None)
+    #plt.savefig, bbox_inches="tight")
 
 '''
 
