@@ -101,8 +101,9 @@ def main():
 
     else:
         selection = ['static','interactive']
-        user_input2 = my_expander_selecting.radio("Interactive or static plot? ",selection)
-        if user_input2=="static":
+        my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
+        user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
+        if user_input3=="static":
             dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
             gdf = geopandas.GeoDataFrame(
                 dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
@@ -114,8 +115,8 @@ def main():
             ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
             plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
             st.pyplot(plt,use_column_width=False,width=None)
-            st.write(df)
-        if user_input2=="interactive":
+            #st.write(df)
+        if user_input3=="interactive":
             df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
             df2["lat"] = df["latitude"]
             df2["lon"] = df["longitude"]
@@ -128,6 +129,8 @@ def main():
                 else:
                     cnt+=1
                 colors.append(tab10[cnt])
+
+            mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
             figg = px.scatter_geo(df2)#, locations="iso_alpha")
             figg.add_trace(
                 go.Scattergeo(
@@ -138,8 +141,8 @@ def main():
                         opacity=0.5,
                         color=colors,
                     ),
-                    text=list(df2.index),
-                    hovertemplate=list(df2.index),
+                    text=mouse_over,
+                    hovertemplate=mouse_over,
                 )
             )
             st.write(figg)
@@ -153,7 +156,14 @@ def main():
             )  # Create figure
             layout["width"] = 925
             layout["height"] = 925
-            st.table(df)
+
+    selection = ['data_frame','table']
+    my_expander_table_selecting = st.sidebar.beta_expander("scroll table or frame?")
+    user_input3 = my_expander_table_selecting.radio("scroll table or frame?",selection)
+    if user_input3=="table":
+        st.table(df)
+    if user_input3=="data_frame":
+        st.write(df)
 
 if __name__ == "__main__":
 
