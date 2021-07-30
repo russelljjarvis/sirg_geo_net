@@ -116,36 +116,36 @@ def main():
             plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
             st.pyplot(plt,use_column_width=False,width=None)
             #st.write(df)
-        if user_input3=="interactive":
-            df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
-            df2["lat"] = df["latitude"]
-            df2["lon"] = df["longitude"]
-            tab10 = sns.color_palette("bright")
-            colors = []
-            cnt=0
-            for i,_ in enumerate(df.index):
-                if cnt==len(tab10)-1:
-                    cnt=0
-                else:
-                    cnt+=1
-                colors.append(tab10[cnt])
+        #if user_input3=="interactive":
+        #    df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
+        #    df2["lat"] = df["latitude"]
+        #    df2["lon"] = df["longitude"]
+        #    tab10 = sns.color_palette("bright")
+        #    colors = []
+        #    cnt=0
+        #    for i,_ in enumerate(df.index):
+        #        if cnt==len(tab10)-1:
+        #            cnt=0
+        #        else:
+        #            cnt+=1
+        #        colors.append(tab10[cnt])
 
-            mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
-            figg = px.scatter_geo(df2)#, locations="iso_alpha")
-            figg.add_trace(
-                go.Scattergeo(
-                    lat=df2["lon"],
-                    lon=df2["lat"],
-                    marker=dict(
-                        size=3.5,  # data['Confirmed-ref'],
-                        opacity=0.5,
-                        color=colors,
-                    ),
-                    text=mouse_over,
-                    hovertemplate=mouse_over,
-                )
-            )
-            st.write(figg)
+        #    mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
+        #    figg = px.scatter_geo(df2)#, locations="iso_alpha")
+        #    figg.add_trace(
+        #        go.Scattergeo(
+        #            lat=df2["lon"],
+        #            lon=df2["lat"],
+        #            marker=dict(
+        #                size=3.5,  # data['Confirmed-ref'],
+        #                opacity=0.5,
+        #                color=colors,
+        #            ),
+        #            text=mouse_over,
+        #            hovertemplate=mouse_over,
+        #        )
+        #    )
+        #    st.write(figg)
 
             # Customize layout
             layout = go.Layout(
