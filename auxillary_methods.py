@@ -15,7 +15,7 @@ import pickle
 import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
-from datashader.bundling import hammer_bundle
+#from datashader.bundling import hammer_bundle
 import matplotlib.pyplot as plt
 import networkx as nx
 
