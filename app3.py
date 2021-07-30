@@ -14,7 +14,7 @@ def get_table_download_link_csv(df):
     csv = df.to_csv().encode()
     # b64 = base64.b64encode(csv.encode()).decode()
     b64 = base64.b64encode(csv).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download csv file</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network as csv file</a>'
     return href
 
 
