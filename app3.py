@@ -76,8 +76,8 @@ def get_table_download_link_csv_edges(df):
 
 def main():
     #try:
-    with open("net_cache2.p", "rb") as f:
-        df = pickle.load(f)
+    #with open("net_cache2.p", "rb") as f:
+    #    df = pickle.load(f)
     #except:
     df,missing_from_viz,df_edges = get_data()
     #    try:
