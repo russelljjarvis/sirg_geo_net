@@ -1,6 +1,7 @@
 geopandas
 pygeos
 geopandas
+semanticscholar
 geopy
 scikit-image
 selenium
