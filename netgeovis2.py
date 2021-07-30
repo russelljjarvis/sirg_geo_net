@@ -488,8 +488,8 @@ def edge_bundle_plotly(
     df_geo = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
     df_geo["lat"] = [i[1] for i in pos_.values()]
     df_geo["lon"] = [i[0] for i in pos_.values()]
-    for name in graph.nodes:
-        assert name in sirg_author_list
+    #for name in graph.nodes:
+    #    assert name in sirg_author_list
         #    print(name)
     df_geo["text"] = list(node for node in graph.nodes)
 

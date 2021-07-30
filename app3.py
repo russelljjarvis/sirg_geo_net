@@ -4,6 +4,7 @@ import pandas as pd
 import geopandas
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import seaborn as sns
 
 def get_table_download_link_csv(df):
     import base64
@@ -119,15 +120,18 @@ def main():
         ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
         plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
         st.pyplot(plt,use_column_width=False,width=None)
-        fig = go.Figure()
-        node_trace = go.Scatter(
-            x=[],
-            y=[],
-            hoverinfo="none",
-            text=([""]),
-            mode="markers+text",
-            marker=dict(color=[], size=[], line=None),
-        )
+        import plotly.express as px
+        st.write(df)
+
+        #fig = go.Figure()
+        #node_trace = go.Scatter(
+        #    x=[],
+        #    y=[],
+        #    hoverinfo="none",
+        #    text=([""]),
+        #    mode="markers+text",
+        #    marker=dict(color=[], size=[], line=None),
+        #)
         # marker=dict(symbol='circle-dot',
         #                            size=5,
         #                            color='#6959CD',
@@ -142,7 +146,6 @@ def main():
         df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
         df2["lat"] = df["latitude"]
         df2["lon"] = df["longitude"]
-        import seaborn as sns
         tab10 = sns.color_palette("bright")
         #subnets = OrderedDict({k: v["g"] for k, v in subnets.items() if hasattr(v, "keys")})
         #color_map = {}
@@ -168,16 +171,15 @@ def main():
 
         #figg.update_geos(projection_type="natural earth")
         #fig.update_layout(height=300, margin={"r":0,"t":0,"l":0,"b":0})
-        import plotly.express as px
 
         figg = px.scatter_geo(df2)#, locations="iso_alpha")
 
         figg.add_trace(
             go.Scattergeo(
-                lat=df2["lat"],
-                lon=df2["lon"],
+                lat=df2["lon"],
+                lon=df2["lat"],
                 marker=dict(
-                    size=13,  # data['Confirmed-ref'],
+                    size=3.5,  # data['Confirmed-ref'],
                     opacity=0.5,
                     color=colors,
                 ),
@@ -196,6 +198,7 @@ def main():
         )  # Create figure
         layout["width"] = 925
         layout["height"] = 925
+        st.table(df)
 
         #fig = go.Figure(layout=layout)  # Add all edge traces
 
@@ -212,7 +215,6 @@ def main():
         #fig["layout"]["height"] = 1825
 
 
-        st.table(df)
 
         #st.write(dft.T)
 
