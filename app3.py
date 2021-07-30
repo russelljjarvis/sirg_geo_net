@@ -161,16 +161,15 @@ def main():
         #        )
         #    )
         #    st.write(figg)
-
-            # Customize layout
-            layout = go.Layout(
-                paper_bgcolor="rgba(0,0,0,0)",  # transparent background
-                plot_bgcolor="rgba(0,0,0,0)",  # transparent 2nd background
-                xaxis={"showgrid": False, "zeroline": False},  # no gridlines
-                yaxis={"showgrid": False, "zeroline": False},  # no gridlines
-            )  # Create figure
-            layout["width"] = 925
-            layout["height"] = 925
+        # Customize layout
+        #    layout = go.Layout(
+        #        paper_bgcolor="rgba(0,0,0,0)",  # transparent background
+        #        plot_bgcolor="rgba(0,0,0,0)",  # transparent 2nd background
+        #        xaxis={"showgrid": False, "zeroline": False},  # no gridlines
+        #        yaxis={"showgrid": False, "zeroline": False},  # no gridlines
+        #    )  # Create figure
+        #    layout["width"] = 925
+        #    layout["height"] = 925
 
     selection = ['data_frame','table']
     my_expander_table_selecting = st.sidebar.beta_expander("scroll table or frame?")
