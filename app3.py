@@ -6,17 +6,8 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import seaborn as sns
 import plotly.express as px
-
-def get_table_download_link_csv(df):
-    import base64
-
-    # csv = df.to_csv(index=False)
-    csv = df.to_csv().encode()
-    # b64 = base64.b64encode(csv.encode()).decode()
-    b64 = base64.b64encode(csv).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network as csv file</a>'
-    return href
-    from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
+from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
+import networkx as nx
 
 def get_data():
     with open("missing_person_name.p", "rb") as f:
@@ -31,6 +22,17 @@ def get_data():
     both_sets_locations_missing,
     sirg_author_list ) = identify_find_missing()
     G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
+    missing_from_viz = set(G.nodes)-set(both_sets_locations_missing.keys())
+
+    mus = set(G.nodes) & set(both_sets_locations_missing.keys())
+
+    sub_graph = nx.subgraph(G, mus)
+    list_of_edges = []
+    for src,tgt in G.edges():
+        list_of_edges.append({'src':src,'tgt':tgt})
+    df_edges = pd.DataFrame(list_of_edges)
+
+
     both_sets_locations_ = {}
     long = {}
     lat = {}
@@ -48,23 +50,57 @@ def get_data():
     del df["lat_long"]
     with open("net_cache2.p", "wb") as f:
         pickle.dump(df,f)
-    return df
+    return df,missing_from_viz,df_edges
+
+
+def get_table_download_link_csv_nodes(df):
+    import base64
+
+    # csv = df.to_csv(index=False)
+    csv = df.to_csv().encode()
+    # b64 = base64.b64encode(csv.encode()).decode()
+    b64 = base64.b64encode(csv).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network nodes as csv file</a>'
+    return href
+
+
+def get_table_download_link_csv_edges(df):
+    import base64
+
+    # csv = df.to_csv(index=False)
+    csv = df.to_csv().encode()
+    # b64 = base64.b64encode(csv.encode()).decode()
+    b64 = base64.b64encode(csv).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network edges as csv file</a>'
+    return href
 
 def main():
-    try:
-        with open("net_cache2.p", "rb") as f:
-            df = pickle.load(f)
-    except:
-        df = get_data()
-        try:
-            with open("net_cache2.p", "rb") as f:
-                df = pickle.load(f)
-        except:
-            pass
+    #try:
+    with open("net_cache2.p", "rb") as f:
+        df = pickle.load(f)
+    #except:
+    df,missing_from_viz,df_edges = get_data()
+    #    try:
+    #        with open("net_cache2.p", "rb") as f:
+    #            df = pickle.load(f)
+    #    except:
+    #        pass
     user_input = False
+    my_expander_dl = st.sidebar.beta_expander("Download Data")
+    if my_expander_dl:
+        st.sidebar.markdown(get_table_download_link_csv_nodes(df), unsafe_allow_html=True)
+        st.sidebar.markdown(get_table_download_link_csv_edges(df_edges), unsafe_allow_html=True)
 
-    st.sidebar.markdown(get_table_download_link_csv(df), unsafe_allow_html=True)
+
+    my_expander_miss = st.sidebar.beta_expander("Researchers Who are missing as their details could not be resolved")
+    clicked_missing = my_expander_miss.button('see missing')
+
+    if clicked_missing:
+        st.markdown("total of {0} missing authors from the SIRG network".format(len(missing_from_viz)))
+
+        st.markdown(missing_from_viz)
     my_expander_selecting = st.sidebar.beta_expander("Update researchers institution/location by selecting")
+
 
     if my_expander_selecting:
         selection = []
@@ -88,11 +124,11 @@ def main():
             st.markdown(user_input)
             #if user_input in df.columns:
             st.write(df[user_input])
-            user_input_inst = st.text_input("Enter University Update", str("None"))
+            user_input_inst = st.text_input("Enter University Update", str("Undefined"))
             df[user_input]["institution"] = user_input_inst
-            user_input_loc_lat = st.text_input("Enter latitude Update", "None")
+            user_input_loc_lat = st.text_input("Enter latitude Update", 0.0)
             df[user_input]["latitude"] = user_input_loc_lat
-            user_input_loc_long = st.text_input("Enter longitude Update", "None")
+            user_input_loc_long = st.text_input("Enter longitude Update", 0.0)
             df[user_input]["longitude"] = user_input_loc_long
             st.markdown("Updated field:")
             df = df.T
@@ -101,11 +137,11 @@ def main():
             df = df.T
             st.markdown("new entry:")
             df[user_input] = None
-            user_input_inst = st.text_input("Enter University Update", str("None"))
+            user_input_inst = st.text_input("Enter University Update", str("Undefined"))
             df[user_input]["institution"] = user_input_inst
-            user_input_loc_lat = st.text_input("Enter latitude Update", "None")
+            user_input_loc_lat = st.text_input("Enter latitude Update", 0.0)
             df[user_input]["latitude"] = user_input_loc_lat
-            user_input_loc_long = st.text_input("Enter longitude Update", "None")
+            user_input_loc_long = st.text_input("Enter longitude Update", 0.0)
             df[user_input]["longitude"] = user_input_loc_long
             st.markdown("Updated field:")
             df = df.T
@@ -174,10 +210,18 @@ def main():
     selection = ['data_frame','table']
     my_expander_table_selecting = st.sidebar.beta_expander("scroll table or frame?")
     user_input3 = my_expander_table_selecting.radio("scroll table or frame?",selection)
+
+
     if user_input3=="table":
+        st.markdown("Node locations")
         st.table(df)
+        st.markdown("node connectivity (source, target)")
+        st.table(df_edges)
     if user_input3=="data_frame":
+        st.markdown("# Node locations")
         st.write(df)
+        st.markdown("# node connectivity (source, target)")
+        st.write(df_edges)
 
 if __name__ == "__main__":
 
