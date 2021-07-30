@@ -112,21 +112,24 @@ def main():
             st.write(df.loc[user_input,:])
 
     else:
-        selection = ['static','interactive']
-        my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
-        user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
-        if user_input3=="static":
-            dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
-            gdf = geopandas.GeoDataFrame(
-                dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
-            )
-            world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-            ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
-            for x,y,name in zip(df["latitude"],df["longitude"],df.index):
+        #selection = ['static','interactive']
+        #my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
+        #user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
+        #if user_input3=="static":
+        dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
+        gdf = geopandas.GeoDataFrame(
+            dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
+        )
+        world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
+        ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
+        for x,y,name in zip(df["latitude"],df["longitude"],df.index):
+            try:
                 ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
-            ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
-            plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
-            st.pyplot(plt,use_column_width=False,width=None)
+            except:
+                pass
+        ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
+        plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
+        st.pyplot(plt,use_column_width=False,width=None)
             #st.write(df)
         #if user_input3=="interactive":
         #    df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
