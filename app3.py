@@ -122,11 +122,11 @@ def main():
         )
         world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
         ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
-        for x,y,name in zip(df["latitude"],df["longitude"],df.index):
-            try:
-                ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
-            except:
-                pass
+        try:
+            for x,y,name in zip(df["latitude"],df["longitude"],df.index):
+                    ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
+        except:
+            pass
         ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
         plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
         st.pyplot(plt,use_column_width=False,width=None)
