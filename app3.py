@@ -148,55 +148,55 @@ def main():
             st.write(df.loc[user_input,:])
 
     else:
-        #selection = ['static','interactive']
-        #my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
-        #user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
-        #if user_input3=="static":
-        dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
-        gdf = geopandas.GeoDataFrame(
-            dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
-        )
-        world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-        ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
-        try:
-            for x,y,name in zip(df["latitude"],df["longitude"],df.index):
-                    ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
-        except:
-            pass
-        ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
-        plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
-        st.pyplot(plt,use_column_width=False,width=None)
+        selection = ['static','interactive']
+        my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
+        user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
+        if user_input3=="static":
+            dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
+            gdf = geopandas.GeoDataFrame(
+                dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
+            )
+            world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
+            ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
+            try:
+                for x,y,name in zip(df["latitude"],df["longitude"],df.index):
+                        ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
+            except:
+                pass
+            ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
+            plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
+            st.pyplot(plt,use_column_width=False,width=None)
             #st.write(df)
-        #if user_input3=="interactive":
-        #    df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
-        #    df2["lat"] = df["latitude"]
-        #    df2["lon"] = df["longitude"]
-        #    tab10 = sns.color_palette("bright")
-        #    colors = []
-        #    cnt=0
-        #    for i,_ in enumerate(df.index):
-        #        if cnt==len(tab10)-1:
-        #            cnt=0
-        #        else:
-        #            cnt+=1
-        #        colors.append(tab10[cnt])
+        if user_input3=="interactive":
+            df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
+            df2["lat"] = df["latitude"]
+            df2["lon"] = df["longitude"]
+            tab10 = sns.color_palette("bright")
+            colors = []
+            cnt=0
+            for i,_ in enumerate(df.index):
+                if cnt==len(tab10)-1:
+                    cnt=0
+                else:
+                    cnt+=1
+                colors.append(tab10[cnt])
 
-        #    mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
-        #    figg = px.scatter_geo(df2)#, locations="iso_alpha")
-        #    figg.add_trace(
-        #        go.Scattergeo(
-        #            lat=df2["lon"],
-        #            lon=df2["lat"],
-        #            marker=dict(
-        #                size=3.5,  # data['Confirmed-ref'],
-        #                opacity=0.5,
-        #                color=colors,
-        #            ),
-        #            text=mouse_over,
-        #            hovertemplate=mouse_over,
-        #        )
-        #    )
-        #    st.write(figg)
+            mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
+            figg = px.scatter_geo(df2)#, locations="iso_alpha")
+            figg.add_trace(
+                go.Scattergeo(
+                    lat=df2["lon"],
+                    lon=df2["lat"],
+                    marker=dict(
+                        size=3.5,  # data['Confirmed-ref'],
+                        opacity=0.5,
+                        color=colors,
+                    ),
+                    text=mouse_over,
+                    hovertemplate=mouse_over,
+                )
+            )
+            st.write(figg)
         # Customize layout
         #    layout = go.Layout(
         #        paper_bgcolor="rgba(0,0,0,0)",  # transparent background
