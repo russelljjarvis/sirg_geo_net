@@ -17,37 +17,37 @@ def get_table_download_link_csv(df):
     href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download csv file</a>'
     return href
 
-from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
-with open("missing_person_name.p", "rb") as f:
-    missing_person_name = pickle.load(f)
-with open("net_cache.p", "rb") as f:
-    temp = pickle.load(f)
-
-( mg,
-both_sets_locations,
-missing_person_name,
-missing_person_location,
-both_sets_locations_missing,
-sirg_author_list ) = identify_find_missing()
-G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
-both_sets_locations_ = {}
-long = {}
-lat = {}
-for k,v in both_sets_locations.items():
-    #both_sets_locations_[k] = list([v[0],v[1]])
-    long[k] = v[0]
-    lat[k] = v[1]
-#both_sets_locations = both_sets_locations_
-df = pd.DataFrame(both_sets_locations)#,long,lat])
-df.rename(index={0:'institution',1:'lat_long'},inplace=True)
-df = df.T
-df["longitude"] = [i[0] for i in df['lat_long']]
-df["latitude"] = [i[1] for i in df['lat_long']]
-del df["lat_long"]
-
 
 def main():
 
+
+    from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
+    with open("missing_person_name.p", "rb") as f:
+        missing_person_name = pickle.load(f)
+    with open("net_cache.p", "rb") as f:
+        temp = pickle.load(f)
+
+    ( mg,
+    both_sets_locations,
+    missing_person_name,
+    missing_person_location,
+    both_sets_locations_missing,
+    sirg_author_list ) = identify_find_missing()
+    G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
+    both_sets_locations_ = {}
+    long = {}
+    lat = {}
+    for k,v in both_sets_locations.items():
+        #both_sets_locations_[k] = list([v[0],v[1]])
+        long[k] = v[0]
+        lat[k] = v[1]
+    #both_sets_locations = both_sets_locations_
+    df = pd.DataFrame(both_sets_locations)#,long,lat])
+    df.rename(index={0:'institution',1:'lat_long'},inplace=True)
+    df = df.T
+    df["longitude"] = [i[0] for i in df['lat_long']]
+    df["latitude"] = [i[1] for i in df['lat_long']]
+    del df["lat_long"]
 
     user_input = False
 
