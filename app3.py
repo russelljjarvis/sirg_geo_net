@@ -163,10 +163,10 @@ def main():
             else:
                 cnt+=1
             colors.append(tab10[cnt])
-        figg = go.Figure(go.Scattergeo())
-        st.write(figg)
+        #figg = go.Figure(go.Scattergeo())
+        #st.write(figg)
 
-        figg.update_geos(projection_type="natural earth")
+        #figg.update_geos(projection_type="natural earth")
         #fig.update_layout(height=300, margin={"r":0,"t":0,"l":0,"b":0})
         import plotly.express as px
 
@@ -177,7 +177,7 @@ def main():
                 lat=df2["lat"],
                 lon=df2["lon"],
                 marker=dict(
-                    size=130,  # data['Confirmed-ref'],
+                    size=13,  # data['Confirmed-ref'],
                     opacity=0.5,
                     color=colors,
                 ),
