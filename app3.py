@@ -16,12 +16,9 @@ def get_table_download_link_csv(df):
     b64 = base64.b64encode(csv).decode()
     href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network as csv file</a>'
     return href
-
-
-def main():
-
-
     from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
+
+def get_data():
     with open("missing_person_name.p", "rb") as f:
         missing_person_name = pickle.load(f)
     with open("net_cache.p", "rb") as f:
@@ -42,13 +39,28 @@ def main():
         long[k] = v[0]
         lat[k] = v[1]
     #both_sets_locations = both_sets_locations_
+
     df = pd.DataFrame(both_sets_locations)#,long,lat])
     df.rename(index={0:'institution',1:'lat_long'},inplace=True)
     df = df.T
     df["longitude"] = [i[0] for i in df['lat_long']]
     df["latitude"] = [i[1] for i in df['lat_long']]
     del df["lat_long"]
+    with open("net_cache2.p", "wb") as f:
+        pickle.dump(df,f)
+    return df
 
+def main():
+    try:
+        with open("net_cache2.p", "rb") as f:
+            df = pickle.load(f)
+    except:
+        df = get_data()
+        try:
+            with open("net_cache2.p", "rb") as f:
+                df = pickle.load(f)
+        except:
+            pass
     user_input = False
 
     st.sidebar.markdown(get_table_download_link_csv(df), unsafe_allow_html=True)
