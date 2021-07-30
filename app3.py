@@ -5,6 +5,7 @@ import geopandas
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import seaborn as sns
+import plotly.express as px
 
 def get_table_download_link_csv(df):
     import base64
@@ -17,36 +18,36 @@ def get_table_download_link_csv(df):
     return href
 
 from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
+with open("missing_person_name.p", "rb") as f:
+    missing_person_name = pickle.load(f)
+with open("net_cache.p", "rb") as f:
+    temp = pickle.load(f)
+
+( mg,
+both_sets_locations,
+missing_person_name,
+missing_person_location,
+both_sets_locations_missing,
+sirg_author_list ) = identify_find_missing()
+G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
+both_sets_locations_ = {}
+long = {}
+lat = {}
+for k,v in both_sets_locations.items():
+    #both_sets_locations_[k] = list([v[0],v[1]])
+    long[k] = v[0]
+    lat[k] = v[1]
+#both_sets_locations = both_sets_locations_
+df = pd.DataFrame(both_sets_locations)#,long,lat])
+df.rename(index={0:'institution',1:'lat_long'},inplace=True)
+df = df.T
+df["longitude"] = [i[0] for i in df['lat_long']]
+df["latitude"] = [i[1] for i in df['lat_long']]
+del df["lat_long"]
+
 
 def main():
-    with open("missing_person_name.p", "rb") as f:
-        missing_person_name = pickle.load(f)
-    with open("net_cache.p", "rb") as f:
-        temp = pickle.load(f)
 
-    ( mg,
-    both_sets_locations,
-    missing_person_name,
-    missing_person_location,
-    both_sets_locations_missing,
-    sirg_author_list ) = identify_find_missing()
-    G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
-
-
-    both_sets_locations_ = {}
-    long = {}
-    lat = {}
-    for k,v in both_sets_locations.items():
-        #both_sets_locations_[k] = list([v[0],v[1]])
-        long[k] = v[0]
-        lat[k] = v[1]
-    #both_sets_locations = both_sets_locations_
-    df = pd.DataFrame(both_sets_locations)#,long,lat])
-    df.rename(index={0:'institution',1:'lat_long'},inplace=True)
-    df = df.T
-    df["longitude"] = [i[0] for i in df['lat_long']]
-    df["latitude"] = [i[1] for i in df['lat_long']]
-    del df["lat_long"]
 
     user_input = False
 
@@ -99,139 +100,60 @@ def main():
             st.write(df.loc[user_input,:])
 
     else:
-
-        #my_expander_selecting = st.sidebar.beta_expander("Plot data")
-
-        #if my_expander_selecting:
-        #    selection = []
-        #    selection.append(False)
-        #    selection.extend(list(df.index))
-        #    user_input0 = my_expander_selecting.radio("select name as appears here ",selection)
-        #my_expander_keyin = st.sidebar.beta_expander("Update researchers institution location by typing (new name)")
-
-        dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
-        gdf = geopandas.GeoDataFrame(
-            dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
-        )
-        world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-        ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
-        for x,y,name in zip(df["latitude"],df["longitude"],df.index):
-            ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
-        ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
-        plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
-        st.pyplot(plt,use_column_width=False,width=None)
-        import plotly.express as px
-        st.write(df)
-
-        #fig = go.Figure()
-        #node_trace = go.Scatter(
-        #    x=[],
-        #    y=[],
-        #    hoverinfo="none",
-        #    text=([""]),
-        #    mode="markers+text",
-        #    marker=dict(color=[], size=[], line=None),
-        #)
-        # marker=dict(symbol='circle-dot',
-        #                            size=5,
-        #                            color='#6959CD',
-        #                            line=dict(color='rgb(50,50,50)', width=0.5))
-
-        #for x,y,name,institution in zip(df["latitude"],df["longitude"],df.index,df["institution"]):
-        #    node_trace["x"] += tuple([x])
-        #    node_trace["y"] += tuple([y])
-        #    node_trace["marker"]["color"] += tuple(["cornflowerblue"])
-        #    node_trace["marker"]["size"] += tuple([5.45])# * g.nodes()[node]["size"]])
-
-        df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
-        df2["lat"] = df["latitude"]
-        df2["lon"] = df["longitude"]
-        tab10 = sns.color_palette("bright")
-        #subnets = OrderedDict({k: v["g"] for k, v in subnets.items() if hasattr(v, "keys")})
-        #color_map = {}
-        #color_value_index = 0
-        #for k, v in subnets.items():
-        #    color_value_index += 1
-        #    color_map[k] = color_value_index
-
-        #sub_net_numb = {}
-        #for sbn, (k, v) in enumerate(subnets.items()):
-        #    for sub_node in v.nodes:
-        #        sub_net_numb[sub_node] = sbn
-        colors = []
-        cnt=0
-        for i,_ in enumerate(df.index):
-            if cnt==len(tab10)-1:
-                cnt=0
-            else:
-                cnt+=1
-            colors.append(tab10[cnt])
-        #figg = go.Figure(go.Scattergeo())
-        #st.write(figg)
-
-        #figg.update_geos(projection_type="natural earth")
-        #fig.update_layout(height=300, margin={"r":0,"t":0,"l":0,"b":0})
-
-        figg = px.scatter_geo(df2)#, locations="iso_alpha")
-
-        figg.add_trace(
-            go.Scattergeo(
-                lat=df2["lon"],
-                lon=df2["lat"],
-                marker=dict(
-                    size=3.5,  # data['Confirmed-ref'],
-                    opacity=0.5,
-                    color=colors,
-                ),
-                text=list(df2.index),
-                hovertemplate=list(df2.index),
+        selection = ['static','interactive']
+        user_input2 = my_expander_selecting.radio("Interactive or static plot? ",selection)
+        if user_input2=="static":
+            dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
+            gdf = geopandas.GeoDataFrame(
+                dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
             )
-        )
-        st.write(figg)
+            world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
+            ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
+            for x,y,name in zip(df["latitude"],df["longitude"],df.index):
+                ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
+            ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
+            plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
+            st.pyplot(plt,use_column_width=False,width=None)
+            st.write(df)
+        if user_input2=="interactive":
+            df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
+            df2["lat"] = df["latitude"]
+            df2["lon"] = df["longitude"]
+            tab10 = sns.color_palette("bright")
+            colors = []
+            cnt=0
+            for i,_ in enumerate(df.index):
+                if cnt==len(tab10)-1:
+                    cnt=0
+                else:
+                    cnt+=1
+                colors.append(tab10[cnt])
+            figg = px.scatter_geo(df2)#, locations="iso_alpha")
+            figg.add_trace(
+                go.Scattergeo(
+                    lat=df2["lon"],
+                    lon=df2["lat"],
+                    marker=dict(
+                        size=3.5,  # data['Confirmed-ref'],
+                        opacity=0.5,
+                        color=colors,
+                    ),
+                    text=list(df2.index),
+                    hovertemplate=list(df2.index),
+                )
+            )
+            st.write(figg)
 
-        # Customize layout
-        layout = go.Layout(
-            paper_bgcolor="rgba(0,0,0,0)",  # transparent background
-            plot_bgcolor="rgba(0,0,0,0)",  # transparent 2nd background
-            xaxis={"showgrid": False, "zeroline": False},  # no gridlines
-            yaxis={"showgrid": False, "zeroline": False},  # no gridlines
-        )  # Create figure
-        layout["width"] = 925
-        layout["height"] = 925
-        st.table(df)
-
-        #fig = go.Figure(layout=layout)  # Add all edge traces
-
-
-        #for trace in edge_trace:
-        #    fig.add_trace(trace)  # Add node trace
-        #fig.add_trace(node_trace)  # Remove legend
-
-        #fig.add_traces(other_traces)
-
-
-        # layout = fig["layout"]
-        #fig["layout"]["width"] = 1825
-        #fig["layout"]["height"] = 1825
-
-
-
-        #st.write(dft.T)
-
-    #except:
-    #    my_expander.warning(
-    #        "This user has not participated in survey, but people have answered questions about them"
-    #    )
-    #    my_expander.warning("Try toggling the transpose")
-    #    my_expander.write(df[user_input])
-    #    my_expander.write(df.loc[df.index.isin([user_input])])
-
-
-    #import pdb
-    #pdb.set_trace()
-
-
-    #st.markdown("Processed anonymized network data that is visualized")
+            # Customize layout
+            layout = go.Layout(
+                paper_bgcolor="rgba(0,0,0,0)",  # transparent background
+                plot_bgcolor="rgba(0,0,0,0)",  # transparent 2nd background
+                xaxis={"showgrid": False, "zeroline": False},  # no gridlines
+                yaxis={"showgrid": False, "zeroline": False},  # no gridlines
+            )  # Create figure
+            layout["width"] = 925
+            layout["height"] = 925
+            st.table(df)
 
 if __name__ == "__main__":
 
