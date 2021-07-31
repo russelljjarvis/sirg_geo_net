@@ -60,7 +60,7 @@ def get_table_download_link_csv_nodes(df):
     csv = df.to_csv().encode()
     # b64 = base64.b64encode(csv.encode()).decode()
     b64 = base64.b64encode(csv).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network nodes as csv file</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo-coded network node locations as csv file</a>'
     return href
 
 
@@ -71,7 +71,7 @@ def get_table_download_link_csv_edges(df):
     csv = df.to_csv().encode()
     # b64 = base64.b64encode(csv.encode()).decode()
     b64 = base64.b64encode(csv).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network edges as csv file</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="captura.csv" target="_blank">Download SIRG geo network connectivity as csv file</a>'
     return href
 
 def main():
@@ -148,7 +148,7 @@ def main():
             st.write(df.loc[user_input,:])
 
     else:
-        selection = ['static','interactive']
+        selection = ['interactive','static']
         my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
