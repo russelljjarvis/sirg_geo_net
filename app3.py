@@ -22,7 +22,7 @@ def get_data():
     both_sets_locations_missing,
     sirg_author_list ) = identify_find_missing()
     G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
-    missing_from_viz = set(G.nodes)-set(both_sets_locations_missing.keys())
+    missing_from_viz = set(list(both_sets_locations_missing.keys()))-set(list(G.nodes))
 
     mus = set(G.nodes) & set(both_sets_locations_missing.keys())
 
@@ -50,7 +50,7 @@ def get_data():
     del df["lat_long"]
     with open("net_cache2.p", "wb") as f:
         pickle.dump(df,f)
-    return df,missing_from_viz,df_edges
+    return df,missing_from_viz,df_edges,sirg_author_list
 
 
 def get_table_download_link_csv_nodes(df):
@@ -79,24 +79,31 @@ def main():
     #with open("net_cache2.p", "rb") as f:
     #    df = pickle.load(f)
     #except:
-    df,missing_from_viz,df_edges = get_data()
+    df,missing_from_viz,df_edges,sirg_author_list = get_data()
     #    try:
     #        with open("net_cache2.p", "rb") as f:
     #            df = pickle.load(f)
     #    except:
     #        pass
-    user_input = False
-    my_expander_dl = st.sidebar.beta_expander("Download Data")
-    if my_expander_dl:
-        st.sidebar.markdown(get_table_download_link_csv_nodes(df), unsafe_allow_html=True)
-        st.sidebar.markdown(get_table_download_link_csv_edges(df_edges), unsafe_allow_html=True)
+    #user_input = False
+    #my_expander_dl = st.sidebar.beta_expander("Download Data")
+    #if my_expander_dl:
+    st.sidebar.markdown(get_table_download_link_csv_nodes(df), unsafe_allow_html=True)
+    st.sidebar.markdown(get_table_download_link_csv_edges(df_edges), unsafe_allow_html=True)
+
+    my_expander_pi = st.sidebar.beta_expander("Social Insect Research Group Principle Investigators")
+    clicked_pi = my_expander_pi.button('see PIs')
+
+    if clicked_pi:
+        st.markdown("# Social Insect Research Group Principle Investigators {0}".format(sirg_author_list))
 
 
     my_expander_miss = st.sidebar.beta_expander("Researchers Who are missing as their details could not be resolved")
     clicked_missing = my_expander_miss.button('see missing')
 
     if clicked_missing:
-        st.markdown("total of {0} missing authors from the SIRG network".format(len(missing_from_viz)))
+        st.markdown("Total of {0} missing authors from the SIRG network".format(len(missing_from_viz)))
+        st.markdown("Total of {0} included authors in the SIRG network".format(len(df)))
 
         st.markdown(missing_from_viz)
     my_expander_selecting = st.sidebar.beta_expander("Update researchers institution/location by selecting")
