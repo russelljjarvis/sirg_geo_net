@@ -102,8 +102,9 @@ def main():
     clicked_missing = my_expander_miss.button('see missing')
 
     if clicked_missing:
-        st.markdown("Total of {0} missing authors from the SIRG network".format(len(missing_from_viz)))
-        st.markdown("Total of {0} included authors in the SIRG network".format(len(df)))
+        st.markdown("A total of {0} authors are included in the SIRG network because their affiliations and geolocations could be found with GScholar+Orcid".format(len(df)))
+
+        st.markdown("Total of {0} missing authors from the SIRG network because their affiliations and geolocations could NOT be found with GScholar+Orcid".format(len(missing_from_viz)))
 
         st.markdown(missing_from_viz)
     my_expander_selecting = st.sidebar.beta_expander("Update researchers institution/location by selecting")
