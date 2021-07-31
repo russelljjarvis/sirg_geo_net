@@ -95,7 +95,7 @@ def main():
     clicked_pi = my_expander_pi.button('see PIs')
 
     if clicked_pi:
-        st.markdown("Social Insect Research Group Principle Investigators {0}".format(sirg_author_list))
+        my_expander_pi.markdown("Social Insect Research Group Principle Investigators {0}".format(sirg_author_list))
 
 
     my_expander_miss = st.sidebar.beta_expander("Researchers Who are missing as their details could not be resolved")
