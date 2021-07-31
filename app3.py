@@ -22,7 +22,7 @@ def get_data():
     both_sets_locations_missing,
     sirg_author_list ) = identify_find_missing()
     G, second, lat, long, node_location_name, sirg_author_list = remove_missing_persons_from_big_net(both_sets_locations, missing_person_name)
-    missing_from_viz = set(list(both_sets_locations_missing.keys()))-set(list(G.nodes))
+    missing_from_viz = set(list(G.nodes))-set(list(both_sets_locations_missing.keys()))
 
     mus = set(G.nodes) & set(both_sets_locations_missing.keys())
 
