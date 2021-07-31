@@ -51,7 +51,7 @@ def get_data():
     del df["lat_long"]
     #with open("net_cache2.p", "wb") as f:
     #    pickle.dump(df,f)
-    return df,missing_from_viz,df_edges,sirg_author_list
+    return df,missing_from_viz,df_edges,sirg_author_list,second
 
 
 def get_table_download_link_csv_nodes(df):
@@ -80,7 +80,7 @@ def main():
     #with open("net_cache2.p", "rb") as f:
     #    df = pickle.load(f)
     #except:
-    df,missing_from_viz,df_edges,sirg_author_list = get_data()
+    df,missing_from_viz,df_edges,sirg_author_list,second = get_data()
     #    try:
     #        with open("net_cache2.p", "rb") as f:
     #            df = pickle.load(f)
@@ -177,6 +177,26 @@ def main():
             st.pyplot(plt,use_column_width=False,width=None)
             #st.write(df)
         if user_input3=="interactive":
+
+            edge_x = []
+            edge_y = []
+            for edge in second.edges():
+                x0, y0 = second.nodes[edge[0]]['pos']
+                x1, y1 = second.nodes[edge[1]]['pos']
+                edge_x.append(x0)
+                edge_x.append(x1)
+                edge_y.append(y0)
+                edge_y.append(y1)
+
+            edge_trace = go.Scattergeo(
+                lon=edge_x, lat=edge_y,
+                mode="lines",
+                showlegend=False,
+                hoverinfo='skip',
+                line=dict(width=0.025, color="blue"),
+                )
+
+
             df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
             df2["lat"] = df["latitude"]
             df2["lon"] = df["longitude"]
@@ -192,6 +212,8 @@ def main():
 
             mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
             figg = px.scatter_geo(df2)#, locations="iso_alpha")
+            figg.add_traces(edge_trace)
+
             figg.add_trace(
                 go.Scattergeo(
                     lat=df2["lon"],
@@ -205,6 +227,9 @@ def main():
                     hovertemplate=mouse_over,
                 )
             )
+            figg["layout"]["width"] = 1025
+            figg["layout"]["height"] = 1025
+
             st.write(figg)
         # Customize layout
         #    layout = go.Layout(
