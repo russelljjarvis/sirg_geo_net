@@ -177,6 +177,15 @@ def main():
             st.pyplot(plt,use_column_width=False,width=None)
             #st.write(df)
         if user_input3=="interactive":
+            tab10 = sns.color_palette("bright")
+            colors = []
+            cnt=0
+            for i,_ in enumerate(df.index):
+                if cnt==len(tab10)-1:
+                    cnt=0
+                else:
+                    cnt+=1
+                colors.append(tab10[cnt])
 
             edge_x = []
             edge_y = []
@@ -193,42 +202,46 @@ def main():
                 mode="lines",
                 showlegend=False,
                 hoverinfo='skip',
-                line=dict(width=0.025, color="blue"),
+                line=dict(width=0.025, color="green"),
                 )
 
 
             df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
             df2["lat"] = df["latitude"]
             df2["lon"] = df["longitude"]
-            tab10 = sns.color_palette("bright")
-            colors = []
-            cnt=0
-            for i,_ in enumerate(df.index):
-                if cnt==len(tab10)-1:
-                    cnt=0
-                else:
-                    cnt+=1
-                colors.append(tab10[cnt])
 
             mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
             figg = px.scatter_geo(df2)#, locations="iso_alpha")
             figg.add_traces(edge_trace)
 
-            figg.add_trace(
-                go.Scattergeo(
+
+            node_trace = go.Scattergeo(
                     lat=df2["lon"],
                     lon=df2["lat"],
+                    showlegend=False,
                     marker=dict(
-                        size=3.5,  # data['Confirmed-ref'],
-                        opacity=0.5,
-                        color=colors,
+                        size=5.0,  # data['Confirmed-ref'],
+                        opacity=0.9,
+                        color=[],
                     ),
                     text=mouse_over,
                     hovertemplate=mouse_over,
                 )
-            )
+
+            node_adjacencies = []
+            node_text = []
+            for node, adjacencies in enumerate(second.adjacency()):
+                node_adjacencies.append(len(adjacencies[1]))
+                #node_text.append('# of connections: '+str(len(adjacencies[1])))
+
+            #node_trace.marker.color = node_adjacencies
+            #node_trace.text = node_text
+            figg.add_trace(node_trace)
+
+
             figg["layout"]["width"] = 1025
             figg["layout"]["height"] = 1025
+            #figg["layout"]["showarrow"] = True
 
             st.write(figg)
         # Customize layout
