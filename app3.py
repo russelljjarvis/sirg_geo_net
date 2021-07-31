@@ -48,8 +48,8 @@ def get_data():
     df["longitude"] = [i[0] for i in df['lat_long']]
     df["latitude"] = [i[1] for i in df['lat_long']]
     del df["lat_long"]
-    with open("net_cache2.p", "wb") as f:
-        pickle.dump(df,f)
+    #with open("net_cache2.p", "wb") as f:
+    #    pickle.dump(df,f)
     return df,missing_from_viz,df_edges,sirg_author_list
 
 
