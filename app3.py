@@ -221,14 +221,14 @@ def main():
 
 
     if user_input3=="table":
-        st.markdown("Node locations")
+        st.markdown("# Node locations")
         st.table(df)
-        st.markdown("node connectivity (source, target)")
+        st.markdown("# Connectivity Between Nodes Format: (source, target)")
         st.table(df_edges)
     if user_input3=="data_frame":
         st.markdown("# Node locations")
         st.write(df)
-        st.markdown("# node connectivity (source, target)")
+        st.markdown("# Connectivity Format: (source, target)")
         st.write(df_edges)
 
 if __name__ == "__main__":
