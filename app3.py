@@ -157,7 +157,7 @@ def main():
 
     else:
         selection = ['interactive','static']
-        my_expander_plot_selecting = st.sidebar.beta_expander("Interogate interactive geo plot data?")
+        my_expander_plot_selecting = st.sidebar.beta_expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
             dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
