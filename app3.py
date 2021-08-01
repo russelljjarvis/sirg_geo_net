@@ -26,12 +26,15 @@ def get_data():
     everyone = set(list(G.nodes))
     resolved = set(list(both_sets_locations.keys()))
     missing_from_viz = everyone.difference(resolved)
-    mus = set(G.nodes) & set(both_sets_locations_missing.keys())
-
+    #st.text(both_sets_locations.keys())
+    mus = set(G.nodes) & set(both_sets_locations.keys())
+    both_sets_locations["Theodre P. Pavlic"] = copy.copy(both_sets_locations["Brian H. Smith"])
     sub_graph = nx.subgraph(G, mus)
     list_of_edges = []
-    for src,tgt in G.edges():
-        list_of_edges.append({'src':src,'tgt':tgt})
+    for src,tgt in sub_graph.edges():
+        if src in both_sets_locations.keys():
+            if tgt in both_sets_locations.keys():
+                list_of_edges.append({'src':src,'tgt':tgt})
     df_edges = pd.DataFrame(list_of_edges)
 
 
