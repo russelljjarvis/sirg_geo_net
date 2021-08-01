@@ -9,7 +9,7 @@ import plotly.express as px
 from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
 import networkx as nx
 import numpy as np
-
+import copy
 def get_data():
     with open("missing_person_name.p", "rb") as f:
         missing_person_name = pickle.load(f)
@@ -172,34 +172,55 @@ def main():
         indexc = df[df['institution']=="Arizona State University"].index#['longitude'].values[0]
 
         indexc = df[df['institution']=="Arizona State University"].index#['longitude'].values[0]
-        sigma = 1.5
-        for ind in indexc:
-            df.loc[ind,'longitude'] = lons + 0.009*np.random.normal(lons, sigma, 1)
-            df.loc[ind,'latitude'] = lats + 0.009*np.random.normal(lats, sigma, 1)
-            try:
+        #sigma = 1.5
+        from scipy.spatial.distance import pdist
+
+        p = pdist(df[['longitude', 'latitude']])                 # Get (n ** 2 - n) / 2 distances
+        n = len(df)
+        i, j = np.triu_indices(n, 1)              # indices of the upper triangle
+                                                  # of a distance matrix.  Coincides
+                                                  # with calculations from pdist
+
+        too_close = np.zeros(n, bool)             # Initialize a mask for what's close
+        np.logical_or.at(too_close, i, p <= .1)   # logically accumulate if any thing
+                                                  # is too close per row
+                                                  # Note: this will not dupe by the
+                                                  # nature of grabbing the upper triangle
+
+        shape = (too_close.sum(), 2)
+        rng = np.random.rand(*shape) * .35         # The jittering
+        dfj = copy.copy(df)
+        dfj.loc[too_close, ['longitude', 'latitude']] += rng
+
+        #df.plot.scatter('x', 'y')
+        #'''
+        #for ind in indexc:
+        #    df.loc[ind,'longitude'] = lons + 0.011*np.random.normal(lons, sigma, 1)
+        #    df.loc[ind,'latitude'] = lats + 0.011*np.random.normal(lats, sigma, 1)
+        #    try:
                 #st.text(second.nodes[ind]['pos'])
-                second.nodes[ind]['pos'][0] = df.loc[ind,'longitude']
-                second.nodes[ind]['pos'][1] = df.loc[ind,'latitude']
+        #        second.nodes[ind]['pos'][0] = df.loc[ind,'longitude']
+        #        second.nodes[ind]['pos'][1] = df.loc[ind,'latitude']
 
                 #st.text(second.nodes[ind]['pos'])
 
-            except:
-                #st.text(ind)
-                pass
-
+        #    except:
+        #        #st.text(ind)
+        #        pass
+        #'''
         selection = ['interactive','static']
 
         my_expander_plot_selecting = st.sidebar.beta_expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
-            dfw = pd.DataFrame({"Latitude": df["latitude"], "Longitude": df["longitude"], "name": df.index})
+            dfw = pd.DataFrame({"Latitude": dfj["latitude"], "Longitude": dfj["longitude"], "name": dfj.index})
             gdf = geopandas.GeoDataFrame(
                 dfw, geometry=geopandas.points_from_xy(dfw.Longitude, dfw.Latitude)
             )
             world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
             ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
             try:
-                for x,y,name in zip(df["latitude"],df["longitude"],df.index):
+                for x,y,name in zip(dfj["latitude"],dfj["longitude"],dfj.index):
                     ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
             except:
                 pass
@@ -210,7 +231,7 @@ def main():
             tab10 = sns.color_palette("bright")
             colors = []
             cnt=0
-            for i,_ in enumerate(df.index):
+            for i,_ in enumerate(dfj.index):
                 if cnt==len(tab10)-1:
                     cnt=0
                 else:
@@ -220,7 +241,7 @@ def main():
             asu_edge_x = []
             asu_edge_y = []
             for edge in second.edges():
-                if df.loc[edge[0],"institution"]=="Arizona State University":
+                if dfj.loc[edge[0],"institution"]=="Arizona State University":
                     x0, y0 = second.nodes[edge[0]]['pos']
                     x1, y1 = second.nodes[edge[1]]['pos']
                     asu_edge_x.append(x0)
@@ -253,17 +274,45 @@ def main():
                 hoverinfo='skip',
                 line=dict(width=0.025, color="green"),
                 )
-                #st.text(df.loc[ind,:])
+                #st.text(dfj.loc[ind,:])
             # add jitter
 
 
             df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
-            df2["lat"] = df["latitude"]
-            df2["lon"] = df["longitude"]
-            df2["institution"] = df["institution"]
+            df2["lat"] = dfj["latitude"]
+            df2["lon"] = dfj["longitude"]
+            df2["institution"] = dfj["institution"]
 
-            mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
-            figg = px.scatter_geo(df2)#, locations="iso_alpha")
+            mouse_over=[i+str(" ")+j for i,j in zip(list(dfj.index),list(dfj["institution"]))]
+            #st.write(df2[df2['institution']=="Arizona State University"])
+            #st.text(df2[df2['institution']=="Arizona State University"]["lon"].values)
+            #st.text(mouse_over)
+            #figss = px.scatter_geo(df2[df2['institution']=="Arizona State University"])#, locations="iso_alpha")
+            #asu_mt = go.Scattergeo(
+            #        lat=df2[df2['institution']=="Arizona State University"]["lon"].values,
+            #        lon=df2[df2['institution']=="Arizona State University"]["lat"].values,
+            #        marker=dict(
+            #            size=4.0,  # data['Confirmed-ref'],
+            #            opacity=0.9,
+            #            color='purple',
+            #        ),
+            #        text=mouse_over,
+            #        hovertemplate=mouse_over,
+            #    )
+            #figss.add_traces(asu_mt)
+
+            #figss["layout"]["width"] = 1025
+            #figss["layout"]["height"] = 1025
+            #st.write(df2['institution'])
+
+            #st.write(df2[df2['institution']=="Arizona State University"])
+            #figg["layout"]["showarrow"] = True
+
+            #st.write(figss)
+
+
+
+            figg = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
             figg.add_traces(edge_trace)
             figg.add_traces(edge_trace_asu)
 
@@ -285,8 +334,8 @@ def main():
 
             figg.add_traces(asu_trace)
             asu_mt = go.Scattergeo(
-                    lat=df2[df2['institution']=="Arizona State University"]["lon"],
-                    lon=df2[df2['institution']=="Arizona State University"]["lat"],
+                    lat=df2[df2['institution']=="Arizona State University"]["lon"].values,
+                    lon=df2[df2['institution']=="Arizona State University"]["lat"].values,
                     marker=dict(
                         size=11.0,  # data['Confirmed-ref'],
                         opacity=0.9,
