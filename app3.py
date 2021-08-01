@@ -8,6 +8,7 @@ import seaborn as sns
 import plotly.express as px
 from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missing
 import networkx as nx
+import numpy as np
 
 def get_data():
     with open("missing_person_name.p", "rb") as f:
@@ -38,10 +39,8 @@ def get_data():
     long = {}
     lat = {}
     for k,v in both_sets_locations.items():
-        #both_sets_locations_[k] = list([v[0],v[1]])
         long[k] = v[0]
         lat[k] = v[1]
-    #both_sets_locations = both_sets_locations_
 
     df = pd.DataFrame(both_sets_locations)#,long,lat])
     df.rename(index={0:'institution',1:'lat_long'},inplace=True)
@@ -49,8 +48,18 @@ def get_data():
     df["longitude"] = [i[0] for i in df['lat_long']]
     df["latitude"] = [i[1] for i in df['lat_long']]
     del df["lat_long"]
+    lats = df[df['institution']=="ARIZONA STATE UNIVERSITY"]['latitude'].values[0]
+    lons = df[df['institution']=="ARIZONA STATE UNIVERSITY"]['longitude'].values[0]
+    indexc = df[df['institution']=="Arizona State University"].index#['longitude'].values[0]
+
+    for ind in indexc:
+        df.loc[ind,'longitude'] = lons#df[df['institution']=="ARIZONA STATE UNIVERSITY"]['longitude'].values[0]
+        df.loc[ind,'latitude'] = lats#df[df['institution']=="ARIZONA STATE UNIVERSITY"]['latitude'].values[0]
+        df.loc[ind,'institution'] = "Arizona State University"
     #with open("net_cache2.p", "wb") as f:
     #    pickle.dump(df,f)
+
+
     return df,missing_from_viz,df_edges,sirg_author_list,second
 
 
@@ -119,19 +128,16 @@ def main():
     my_expander_keyin = st.sidebar.beta_expander("Update researchers institution location by typing (new name)")
     if my_expander_keyin:
         user_input1 = my_expander_keyin.text_input("Enter name as appears here ie: 'Chelsea N. Cook'",False)
-    #st.text(user_input)
     if user_input0 or user_input1!="False":
         if user_input0:
             user_input = user_input0
         else:
             user_input = user_input1
 
-        #if user_input!="False":
         if user_input in df.columns:
             df = df.T
             st.markdown("You selected:")
             st.markdown(user_input)
-            #if user_input in df.columns:
             st.write(df[user_input])
             user_input_inst = st.text_input("Enter University Update", str("Undefined"))
             df[user_input]["institution"] = user_input_inst
@@ -157,7 +163,32 @@ def main():
             st.write(df.loc[user_input,:])
 
     else:
+        ##
+        # add jitter
+        ##
+
+        lats = df[df['institution']=="ARIZONA STATE UNIVERSITY"]['latitude'].values[0]
+        lons = df[df['institution']=="ARIZONA STATE UNIVERSITY"]['longitude'].values[0]
+        indexc = df[df['institution']=="Arizona State University"].index#['longitude'].values[0]
+
+        indexc = df[df['institution']=="Arizona State University"].index#['longitude'].values[0]
+        sigma = 1.5
+        for ind in indexc:
+            df.loc[ind,'longitude'] = lons + 0.009*np.random.normal(lons, sigma, 1)
+            df.loc[ind,'latitude'] = lats + 0.009*np.random.normal(lats, sigma, 1)
+            try:
+                #st.text(second.nodes[ind]['pos'])
+                second.nodes[ind]['pos'][0] = df.loc[ind,'longitude']
+                second.nodes[ind]['pos'][1] = df.loc[ind,'latitude']
+
+                #st.text(second.nodes[ind]['pos'])
+
+            except:
+                #st.text(ind)
+                pass
+
         selection = ['interactive','static']
+
         my_expander_plot_selecting = st.sidebar.beta_expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
@@ -169,13 +200,12 @@ def main():
             ax = world.plot(color="white", edgecolor="black", figsize=(60, 60))
             try:
                 for x,y,name in zip(df["latitude"],df["longitude"],df.index):
-                        ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
+                    ax0 = plt.scatter(x,y, s=280, facecolors='b', edgecolors='b')
             except:
                 pass
             ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
             plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
             st.pyplot(plt,use_column_width=False,width=None)
-            #st.write(df)
         if user_input3=="interactive":
             tab10 = sns.color_palette("bright")
             colors = []
@@ -186,6 +216,25 @@ def main():
                 else:
                     cnt+=1
                 colors.append(tab10[cnt])
+
+            asu_edge_x = []
+            asu_edge_y = []
+            for edge in second.edges():
+                if df.loc[edge[0],"institution"]=="Arizona State University":
+                    x0, y0 = second.nodes[edge[0]]['pos']
+                    x1, y1 = second.nodes[edge[1]]['pos']
+                    asu_edge_x.append(x0)
+                    asu_edge_x.append(x1)
+                    asu_edge_y.append(y0)
+                    asu_edge_y.append(y1)
+                    #st.text("hit")
+            edge_trace_asu = go.Scattergeo(
+                lon=asu_edge_x, lat=asu_edge_y,
+                mode="lines",
+                showlegend=False,
+                hoverinfo='skip',
+                line=dict(width=0.175, color="blue"),
+                )
 
             edge_x = []
             edge_y = []
@@ -204,21 +253,53 @@ def main():
                 hoverinfo='skip',
                 line=dict(width=0.025, color="green"),
                 )
+                #st.text(df.loc[ind,:])
+            # add jitter
 
 
-            df2 = pd.DataFrame(columns=["lat", "lon", "text", "size", "color"])
+            df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
             df2["lat"] = df["latitude"]
             df2["lon"] = df["longitude"]
+            df2["institution"] = df["institution"]
 
             mouse_over=[i+str(" ")+j for i,j in zip(list(df2.index),list(df["institution"]))]
             figg = px.scatter_geo(df2)#, locations="iso_alpha")
             figg.add_traces(edge_trace)
+            figg.add_traces(edge_trace_asu)
 
+            #st.text(len(df2["lon"]))
+            #st.text(len(df))
+            #ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
 
+            asu_trace = go.Scattergeo(
+                    lat=[33.42152185],
+                    lon=[-111.93316158417922],
+                    marker=dict(
+                        size=16.0,  # data['Confirmed-ref'],
+                        opacity=0.53,
+                        color='red',
+                    ),
+                    text="ASU",
+                    hovertemplate="ASU",
+                )
+
+            figg.add_traces(asu_trace)
+            asu_mt = go.Scattergeo(
+                    lat=df2[df2['institution']=="Arizona State University"]["lon"],
+                    lon=df2[df2['institution']=="Arizona State University"]["lat"],
+                    marker=dict(
+                        size=11.0,  # data['Confirmed-ref'],
+                        opacity=0.9,
+                        color='purple',
+                    ),
+                    text=mouse_over,
+                    hovertemplate=mouse_over,
+                )
+            figg.add_traces(asu_mt)
+            #st.text(df2[df2['institution']=="Arizona State University"])
             node_trace = go.Scattergeo(
                     lat=df2["lon"],
                     lon=df2["lat"],
-                    showlegend=False,
                     marker=dict(
                         size=5.0,  # data['Confirmed-ref'],
                         opacity=0.9,
@@ -228,10 +309,11 @@ def main():
                     hovertemplate=mouse_over,
                 )
 
-            node_adjacencies = []
-            node_text = []
-            for node, adjacencies in enumerate(second.adjacency()):
-                node_adjacencies.append(len(adjacencies[1]))
+
+            #node_adjacencies = []
+            #node_text = []
+            #for node, adjacencies in enumerate(second.adjacency()):
+            #    node_adjacencies.append(len(adjacencies[1]))
                 #node_text.append('# of connections: '+str(len(adjacencies[1])))
 
             #node_trace.marker.color = node_adjacencies
