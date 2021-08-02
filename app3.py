@@ -32,9 +32,8 @@ def get_data():
     sub_graph = nx.subgraph(G, mus)
     list_of_edges = []
     for src,tgt in sub_graph.edges():
-        if src in both_sets_locations.keys():
-            if tgt in both_sets_locations.keys():
-                list_of_edges.append({'src':src,'tgt':tgt})
+        if src in both_sets_locations.keys() and tgt in both_sets_locations.keys():
+            list_of_edges.append({'src':src,'tgt':tgt})
     df_edges = pd.DataFrame(list_of_edges)
 
 
@@ -212,7 +211,6 @@ def main():
         #        pass
         #'''
         selection = ['interactive','static']
-
         my_expander_plot_selecting = st.sidebar.beta_expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
@@ -316,8 +314,17 @@ def main():
 
 
             figg = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
-            figg.add_traces(edge_trace)
-            figg.add_traces(edge_trace_asu)
+
+            selection = ['everyone','asu_only']#,'indirect_only']
+            my_expander_direct = st.sidebar.beta_expander("Direct or indirect Connnections?")
+            asu_only = my_expander_direct.radio("Interactive or static plot? ",selection)
+            if not asu_only =='asu_only':# and not asu_only =='indirect_only':
+                figg.add_traces(edge_trace)
+                figg.add_traces(edge_trace_asu)
+
+            if asu_only =='asu_only':# or asu_only=='everyone':
+
+                figg.add_traces(edge_trace_asu)
 
             #st.text(len(df2["lon"]))
             #st.text(len(df))
@@ -369,7 +376,7 @@ def main():
                 #node_text.append('# of connections: '+str(len(adjacencies[1])))
 
             #node_trace.marker.color = node_adjacencies
-            #node_trace.text = node_text
+            #node_trace.text = node_te
             figg.add_trace(node_trace)
 
 
