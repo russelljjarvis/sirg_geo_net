@@ -26,6 +26,7 @@ def get_data():
     everyone = set(list(G.nodes))
     resolved = set(list(both_sets_locations.keys()))
     missing_from_viz = everyone.difference(resolved)
+
     #st.text(both_sets_locations.keys())
     mus = set(G.nodes) & set(both_sets_locations.keys())
     both_sets_locations["Theodre P. Pavlic"] = copy.copy(both_sets_locations["Brian H. Smith"])
@@ -61,6 +62,9 @@ def get_data():
     #with open("net_cache2.p", "wb") as f:
     #    pickle.dump(df,f)
 
+    with open("for_elsevier_api.p", "wb") as f:
+        pickle.dump([missing_from_viz,second,G,mg],f)
+
 
     return df,missing_from_viz,df_edges,sirg_author_list,second
 
@@ -92,25 +96,24 @@ def main():
     #    df = pickle.load(f)
     #except:
     df,missing_from_viz,df_edges,sirg_author_list,second = get_data()
-    #    try:
-    #        with open("net_cache2.p", "rb") as f:
-    #            df = pickle.load(f)
+
     #    except:
     #        pass
     #user_input = False
-    #my_expander_dl = st.sidebar.beta_expander("Download Data")
+    #my_expander_dl = st.sidebar.expander("Download Data")
     #if my_expander_dl:
     st.sidebar.markdown(get_table_download_link_csv_nodes(df), unsafe_allow_html=True)
+
     st.sidebar.markdown(get_table_download_link_csv_edges(df_edges), unsafe_allow_html=True)
 
-    my_expander_pi = st.sidebar.beta_expander("Social Insect Research Group Principle Investigators")
+    my_expander_pi = st.sidebar.expander("Social Insect Research Group Principle Investigators")
     clicked_pi = my_expander_pi.button('see PIs')
 
     if clicked_pi:
         my_expander_pi.markdown("Social Insect Research Group Principle Investigators {0}".format(sirg_author_list))
 
 
-    my_expander_miss = st.sidebar.beta_expander("Researchers Who are missing as their details could not be resolved")
+    my_expander_miss = st.sidebar.expander("Researchers Who are missing as their details could not be resolved")
     clicked_missing = my_expander_miss.button('see missing')
 
     if clicked_missing:
@@ -119,7 +122,10 @@ def main():
         st.markdown("Total of {0} missing authors from the SIRG network because their affiliations and geolocations could NOT be found with GScholar+Orcid".format(len(missing_from_viz)))
 
         st.markdown(missing_from_viz)
-    my_expander_selecting = st.sidebar.beta_expander("Update researchers institution/location by selecting")
+
+
+
+    my_expander_selecting = st.sidebar.expander("Update researchers institution/location by selecting")
 
 
     if my_expander_selecting:
@@ -127,7 +133,7 @@ def main():
         selection.append(False)
         selection.extend(list(df.index))
         user_input0 = my_expander_selecting.radio("select name as appears here ",selection)
-    my_expander_keyin = st.sidebar.beta_expander("Update researchers institution location by typing (new name)")
+    my_expander_keyin = st.sidebar.expander("Update researchers institution location by typing (new name)")
     if my_expander_keyin:
         user_input1 = my_expander_keyin.text_input("Enter name as appears here ie: 'Chelsea N. Cook'",False)
     if user_input0 or user_input1!="False":
@@ -184,13 +190,13 @@ def main():
                                                   # with calculations from pdist
 
         too_close = np.zeros(n, bool)             # Initialize a mask for what's close
-        np.logical_or.at(too_close, i, p <= .1)   # logically accumulate if any thing
+        np.logical_or.at(too_close, i, p <= .5)   # logically accumulate if any thing
                                                   # is too close per row
                                                   # Note: this will not dupe by the
                                                   # nature of grabbing the upper triangle
 
         shape = (too_close.sum(), 2)
-        rng = np.random.rand(*shape) * .35         # The jittering
+        rng = np.random.rand(*shape) * .95         # The jittering
         dfj = copy.copy(df)
         dfj.loc[too_close, ['longitude', 'latitude']] += rng
 
@@ -211,7 +217,7 @@ def main():
         #        pass
         #'''
         selection = ['interactive','static']
-        my_expander_plot_selecting = st.sidebar.beta_expander("Interactive or colored static plot?")
+        my_expander_plot_selecting = st.sidebar.expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
             dfw = pd.DataFrame({"Latitude": dfj["latitude"], "Longitude": dfj["longitude"], "name": dfj.index})
@@ -255,7 +261,7 @@ def main():
                 mode="lines",
                 showlegend=False,
                 hoverinfo='skip',
-                line=dict(width=0.175, color="blue"),
+                line=dict(width=0.215, color="blue"),
                 )
 
             edge_x = []
@@ -279,12 +285,6 @@ def main():
             # add jitter
 
 
-            df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
-            df2["lat"] = dfj["latitude"]
-            df2["lon"] = dfj["longitude"]
-            df2["institution"] = dfj["institution"]
-
-            mouse_over=[i+str(" ")+j for i,j in zip(list(dfj.index),list(dfj["institution"]))]
             #st.write(df2[df2['institution']=="Arizona State University"])
             #st.text(df2[df2['institution']=="Arizona State University"]["lon"].values)
             #st.text(mouse_over)
@@ -310,13 +310,19 @@ def main():
             #figg["layout"]["showarrow"] = True
 
             #st.write(figss)
+            df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
+            df2["lat"] = dfj["latitude"]
+            df2["lon"] = dfj["longitude"]
+            df2["institution"] = dfj["institution"]
+
+            mouse_over=[i+str(" ")+j for i,j in zip(list(dfj.index),list(dfj["institution"]))]
 
 
 
             figg = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
 
             selection = ['everyone','asu_only']#,'indirect_only']
-            my_expander_direct = st.sidebar.beta_expander("Direct or indirect Connnections?")
+            my_expander_direct = st.sidebar.expander("Direct or indirect Connnections?")
             asu_only = my_expander_direct.radio("Interactive or static plot? ",selection)
             if not asu_only =='asu_only':# and not asu_only =='indirect_only':
                 figg.add_traces(edge_trace)
@@ -347,9 +353,9 @@ def main():
                     lat=df2[df2['institution']=="Arizona State University"]["lon"].values,
                     lon=df2[df2['institution']=="Arizona State University"]["lat"].values,
                     marker=dict(
-                        size=11.0,  # data['Confirmed-ref'],
-                        opacity=0.9,
-                        color='purple',
+                        size=12.0,  # data['Confirmed-ref'],
+                        opacity=0.5,
+                        color='red',
                     ),
                     text=mouse_over,
                     hovertemplate=mouse_over,
@@ -395,9 +401,38 @@ def main():
         #    layout["width"] = 925
         #    layout["height"] = 925
 
+    selection = [False,True]
+    local_net = st.sidebar.radio("Jittered ASU local Net",selection)
+
+    if local_net==True:
+        df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
+        df2["lat"] = dfj["latitude"]
+        df2["lon"] = dfj["longitude"]
+        df2["institution"] = dfj["institution"]
+
+        dfjj = df2[df2['institution']=="Arizona State University"]
+        mouse_over=[i+str(" ")+j for i,j in zip(list(dfjj.index),list(dfjj["institution"]))]
+
+        figt = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
+
+        asu_mtt = go.Scattergeo(
+                lat=dfjj[dfjj['institution']=="Arizona State University"]["lon"].values,
+                lon=dfjj[dfjj['institution']=="Arizona State University"]["lat"].values,
+                marker=dict(
+                    size=1.0,  # data['Confirmed-ref'],
+                    opacity=0.5,
+                    color='red',
+                ),
+                text=mouse_over,
+                hovertemplate=mouse_over,
+            )
+        figt.add_traces(asu_mtt)
+        st.write(figt)
+
     selection = ['data_frame','table']
-    my_expander_table_selecting = st.sidebar.beta_expander("scroll table or frame?")
+    my_expander_table_selecting = st.sidebar.expander("scroll table or frame?")
     user_input3 = my_expander_table_selecting.radio("scroll table or frame?",selection)
+
 
 
     if user_input3=="table":
