@@ -6,7 +6,7 @@ geopy
 scikit-image
 pyvirtualdisplay
 fsspec>=0.3.3
-streamlit
+streamlit==0.80.0
 jupyter-server-proxy==1.2.0
 nbserverproxy==0.8.8
 tabulate
@@ -16,7 +16,7 @@ networkx
 pyviz
 holoviews
 bokeh
-xarray
+xarray==0.16.2
 datashader
 pandapower
 seaborn
