@@ -21,6 +21,6 @@ datashader
 pandapower
 seaborn
 chart_studio
-plotly=='4.5.2'
+plotly==4.5.2
 tabulate
 colorlover
