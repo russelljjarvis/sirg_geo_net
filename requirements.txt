@@ -4,7 +4,6 @@ geopandas
 semanticscholar
 geopy
 scikit-image
-selenium
 pyvirtualdisplay
 fsspec>=0.3.3
 streamlit
@@ -17,16 +16,11 @@ networkx
 pyviz
 holoviews
 bokeh
-js2py
 xarray
 datashader
 pandapower
 seaborn
-flask
-js2py
-#regex
-#twython
 chart_studio
-plotly
+plotly=='4.5.2'
 tabulate
 colorlover
