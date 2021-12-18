@@ -100,20 +100,20 @@ def main():
     #    except:
     #        pass
     #user_input = False
-    #my_expander_dl = st.sidebar.expander("Download Data")
+    #my_expander_dl = st.sidebar.beta_expander("Download Data")
     #if my_expander_dl:
     st.sidebar.markdown(get_table_download_link_csv_nodes(df), unsafe_allow_html=True)
 
     st.sidebar.markdown(get_table_download_link_csv_edges(df_edges), unsafe_allow_html=True)
 
-    my_expander_pi = st.sidebar.expander("Social Insect Research Group Principle Investigators")
+    my_expander_pi = st.sidebar.beta_expander("Social Insect Research Group Principle Investigators")
     clicked_pi = my_expander_pi.button('see PIs')
 
     if clicked_pi:
         my_expander_pi.markdown("Social Insect Research Group Principle Investigators {0}".format(sirg_author_list))
 
 
-    my_expander_miss = st.sidebar.expander("Researchers Who are missing as their details could not be resolved")
+    my_expander_miss = st.sidebar.beta_expander("Researchers Who are missing as their details could not be resolved")
     clicked_missing = my_expander_miss.button('see missing')
 
     if clicked_missing:
@@ -125,7 +125,7 @@ def main():
 
 
 
-    my_expander_selecting = st.sidebar.expander("Update researchers institution/location by selecting")
+    my_expander_selecting = st.sidebar.beta_expander("Update researchers institution/location by selecting")
 
 
     if my_expander_selecting:
@@ -133,7 +133,7 @@ def main():
         selection.append(False)
         selection.extend(list(df.index))
         user_input0 = my_expander_selecting.radio("select name as appears here ",selection)
-    my_expander_keyin = st.sidebar.expander("Update researchers institution location by typing (new name)")
+    my_expander_keyin = st.sidebar.beta_expander("Update researchers institution location by typing (new name)")
     if my_expander_keyin:
         user_input1 = my_expander_keyin.text_input("Enter name as appears here ie: 'Chelsea N. Cook'",False)
     if user_input0 or user_input1!="False":
@@ -217,7 +217,7 @@ def main():
         #        pass
         #'''
         selection = ['interactive','static']
-        my_expander_plot_selecting = st.sidebar.expander("Interactive or colored static plot?")
+        my_expander_plot_selecting = st.sidebar.beta_expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
         if user_input3=="static":
             dfw = pd.DataFrame({"Latitude": dfj["latitude"], "Longitude": dfj["longitude"], "name": dfj.index})
