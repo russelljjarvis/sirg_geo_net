@@ -322,7 +322,7 @@ def main():
             figg = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
 
             selection = ['everyone','asu_only']#,'indirect_only']
-            my_expander_direct = st.sidebar.expander("Direct or indirect Connnections?")
+            my_expander_direct = st.sidebar.beta_expander("Direct or indirect Connnections?")
             asu_only = my_expander_direct.radio("Interactive or static plot? ",selection)
             if not asu_only =='asu_only':# and not asu_only =='indirect_only':
                 figg.add_traces(edge_trace)
@@ -430,7 +430,7 @@ def main():
         st.write(figt)
 
     selection = ['data_frame','table']
-    my_expander_table_selecting = st.sidebar.expander("scroll table or frame?")
+    my_expander_table_selecting = st.sidebar.beta_expander("scroll table or frame?")
     user_input3 = my_expander_table_selecting.radio("scroll table or frame?",selection)
 
 
