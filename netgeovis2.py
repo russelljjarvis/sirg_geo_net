@@ -33,7 +33,7 @@ from auxillary_methods import plotly_sized
 from grab_js import coords_of_target_university  # , university_data_frame
 
 from collections import OrderedDict
-from datashader.bundling import hammer_bundle
+#from datashader.bundling import hammer_bundle
 
 import pickle
 import streamlit as st
