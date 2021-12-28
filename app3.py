@@ -10,6 +10,12 @@ from netgeovis2 import remove_missing_persons_from_big_net, identify_find_missin
 import networkx as nx
 import numpy as np
 import copy
+
+
+def disable_logo(plot, element):
+    plot.state.toolbar.logo = None
+
+@st.cache
 def get_data():
     with open("missing_person_name.p", "rb") as f:
         missing_person_name = pickle.load(f)
@@ -67,6 +73,124 @@ def get_data():
 
 
     return df,missing_from_viz,df_edges,sirg_author_list,second
+
+
+@st.cache
+def fast_interact_net(dfj,second,dfj):
+    tab10 = sns.color_palette("bright")
+    colors = []
+    cnt=0
+    for i,_ in enumerate(dfj.index):
+        if cnt==len(tab10)-1:
+            cnt=0
+        else:
+            cnt+=1
+        colors.append(tab10[cnt])
+
+    asu_edge_x = []
+    asu_edge_y = []
+    for edge in second.edges():
+        if dfj.loc[edge[0],"institution"]=="Arizona State University":
+            x0, y0 = second.nodes[edge[0]]['pos']
+            x1, y1 = second.nodes[edge[1]]['pos']
+            asu_edge_x.append(x0)
+            asu_edge_x.append(x1)
+            asu_edge_y.append(y0)
+            asu_edge_y.append(y1)
+            #st.text("hit")
+    edge_trace_asu = go.Scattergeo(
+        lon=asu_edge_x, lat=asu_edge_y,
+        mode="lines",
+        showlegend=False,
+        hoverinfo='skip',
+        line=dict(width=0.215, color="blue"),
+        )
+
+    edge_x = []
+    edge_y = []
+    for edge in second.edges():
+        x0, y0 = second.nodes[edge[0]]['pos']
+        x1, y1 = second.nodes[edge[1]]['pos']
+        edge_x.append(x0)
+        edge_x.append(x1)
+        edge_y.append(y0)
+        edge_y.append(y1)
+
+    edge_trace = go.Scattergeo(
+        lon=edge_x, lat=edge_y,
+        mode="lines",
+        showlegend=False,
+        hoverinfo='skip',
+        line=dict(width=0.025, color="green"),
+        )
+
+    df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
+    df2["lat"] = dfj["latitude"]
+    df2["lon"] = dfj["longitude"]
+    df2["institution"] = dfj["institution"]
+
+    mouse_over=[i+str(" ")+j for i,j in zip(list(dfj.index),list(dfj["institution"]))]
+
+
+
+    figg = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
+
+    selection = ['everyone','asu_only']#,'indirect_only']
+    my_expander_direct = st.sidebar.expander("Direct or indirect Connnections?")
+    asu_only = my_expander_direct.radio("Interactive or static plot? ",selection)
+    if not asu_only =='asu_only':# and not asu_only =='indirect_only':
+        figg.add_traces(edge_trace)
+        figg.add_traces(edge_trace_asu)
+
+    if asu_only =='asu_only':# or asu_only=='everyone':
+
+        figg.add_traces(edge_trace_asu)
+
+
+    asu_trace = go.Scattergeo(
+            lat=[33.42152185],
+            lon=[-111.93316158417922],
+            marker=dict(
+                size=16.0,  # data['Confirmed-ref'],
+                opacity=0.53,
+                color='red',
+            ),
+            text="ASU",
+            hovertemplate="ASU",
+        )
+
+    figg.add_traces(asu_trace)
+    asu_mt = go.Scattergeo(
+            lat=df2[df2['institution']=="Arizona State University"]["lon"].values,
+            lon=df2[df2['institution']=="Arizona State University"]["lat"].values,
+            marker=dict(
+                size=12.0,  # data['Confirmed-ref'],
+                opacity=0.5,
+                color='red',
+            ),
+            text=mouse_over,
+            hovertemplate=mouse_over,
+        )
+    figg.add_traces(asu_mt)
+    #st.text(df2[df2['institution']=="Arizona State University"])
+    node_trace = go.Scattergeo(
+            lat=df2["lon"],
+            lon=df2["lat"],
+            marker=dict(
+                size=5.0,  # data['Confirmed-ref'],
+                opacity=0.9,
+                color=[],
+            ),
+            text=mouse_over,
+            hovertemplate=mouse_over,
+        )
+
+    figg.add_trace(node_trace)
+
+
+    figg["layout"]["width"] = 1825
+    figg["layout"]["height"] = 1825
+    return figg
 
 
 def get_table_download_link_csv_nodes(df):
@@ -200,22 +324,6 @@ def main():
         dfj = copy.copy(df)
         dfj.loc[too_close, ['longitude', 'latitude']] += rng
 
-        #df.plot.scatter('x', 'y')
-        #'''
-        #for ind in indexc:
-        #    df.loc[ind,'longitude'] = lons + 0.011*np.random.normal(lons, sigma, 1)
-        #    df.loc[ind,'latitude'] = lats + 0.011*np.random.normal(lats, sigma, 1)
-        #    try:
-                #st.text(second.nodes[ind]['pos'])
-        #        second.nodes[ind]['pos'][0] = df.loc[ind,'longitude']
-        #        second.nodes[ind]['pos'][1] = df.loc[ind,'latitude']
-
-                #st.text(second.nodes[ind]['pos'])
-
-        #    except:
-        #        #st.text(ind)
-        #        pass
-        #'''
         selection = ['interactive','static']
         my_expander_plot_selecting = st.sidebar.expander("Interactive or colored static plot?")
         user_input3 = my_expander_plot_selecting.radio("Interactive or static plot? ",selection)
@@ -235,171 +343,10 @@ def main():
             plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
             st.pyplot(plt,use_column_width=False,width=None)
         if user_input3=="interactive":
-            tab10 = sns.color_palette("bright")
-            colors = []
-            cnt=0
-            for i,_ in enumerate(dfj.index):
-                if cnt==len(tab10)-1:
-                    cnt=0
-                else:
-                    cnt+=1
-                colors.append(tab10[cnt])
-
-            asu_edge_x = []
-            asu_edge_y = []
-            for edge in second.edges():
-                if dfj.loc[edge[0],"institution"]=="Arizona State University":
-                    x0, y0 = second.nodes[edge[0]]['pos']
-                    x1, y1 = second.nodes[edge[1]]['pos']
-                    asu_edge_x.append(x0)
-                    asu_edge_x.append(x1)
-                    asu_edge_y.append(y0)
-                    asu_edge_y.append(y1)
-                    #st.text("hit")
-            edge_trace_asu = go.Scattergeo(
-                lon=asu_edge_x, lat=asu_edge_y,
-                mode="lines",
-                showlegend=False,
-                hoverinfo='skip',
-                line=dict(width=0.215, color="blue"),
-                )
-
-            edge_x = []
-            edge_y = []
-            for edge in second.edges():
-                x0, y0 = second.nodes[edge[0]]['pos']
-                x1, y1 = second.nodes[edge[1]]['pos']
-                edge_x.append(x0)
-                edge_x.append(x1)
-                edge_y.append(y0)
-                edge_y.append(y1)
-
-            edge_trace = go.Scattergeo(
-                lon=edge_x, lat=edge_y,
-                mode="lines",
-                showlegend=False,
-                hoverinfo='skip',
-                line=dict(width=0.025, color="green"),
-                )
-                #st.text(dfj.loc[ind,:])
-            # add jitter
-
-
-            #st.write(df2[df2['institution']=="Arizona State University"])
-            #st.text(df2[df2['institution']=="Arizona State University"]["lon"].values)
-            #st.text(mouse_over)
-            #figss = px.scatter_geo(df2[df2['institution']=="Arizona State University"])#, locations="iso_alpha")
-            #asu_mt = go.Scattergeo(
-            #        lat=df2[df2['institution']=="Arizona State University"]["lon"].values,
-            #        lon=df2[df2['institution']=="Arizona State University"]["lat"].values,
-            #        marker=dict(
-            #            size=4.0,  # data['Confirmed-ref'],
-            #            opacity=0.9,
-            #            color='purple',
-            #        ),
-            #        text=mouse_over,
-            #        hovertemplate=mouse_over,
-            #    )
-            #figss.add_traces(asu_mt)
-
-            #figss["layout"]["width"] = 1025
-            #figss["layout"]["height"] = 1025
-            #st.write(df2['institution'])
-
-            #st.write(df2[df2['institution']=="Arizona State University"])
-            #figg["layout"]["showarrow"] = True
-
-            #st.write(figss)
-            df2 = pd.DataFrame(columns=["lat", "lon"])#, "text", "size", "color"])
-            df2["lat"] = dfj["latitude"]
-            df2["lon"] = dfj["longitude"]
-            df2["institution"] = dfj["institution"]
-
-            mouse_over=[i+str(" ")+j for i,j in zip(list(dfj.index),list(dfj["institution"]))]
-
-
-
-            figg = px.scatter_geo(df2)#,center={'lon':-111.93316158417922,'lat':33.42152185})#, locations="iso_alpha")
-
-            selection = ['everyone','asu_only']#,'indirect_only']
-            my_expander_direct = st.sidebar.expander("Direct or indirect Connnections?")
-            asu_only = my_expander_direct.radio("Interactive or static plot? ",selection)
-            if not asu_only =='asu_only':# and not asu_only =='indirect_only':
-                figg.add_traces(edge_trace)
-                figg.add_traces(edge_trace_asu)
-
-            if asu_only =='asu_only':# or asu_only=='everyone':
-
-                figg.add_traces(edge_trace_asu)
-
-            #st.text(len(df2["lon"]))
-            #st.text(len(df))
-            #ax1 = plt.scatter(-111.93316158417922,33.42152185, s=680, facecolors='r', edgecolors='r')
-
-            asu_trace = go.Scattergeo(
-                    lat=[33.42152185],
-                    lon=[-111.93316158417922],
-                    marker=dict(
-                        size=16.0,  # data['Confirmed-ref'],
-                        opacity=0.53,
-                        color='red',
-                    ),
-                    text="ASU",
-                    hovertemplate="ASU",
-                )
-
-            figg.add_traces(asu_trace)
-            asu_mt = go.Scattergeo(
-                    lat=df2[df2['institution']=="Arizona State University"]["lon"].values,
-                    lon=df2[df2['institution']=="Arizona State University"]["lat"].values,
-                    marker=dict(
-                        size=12.0,  # data['Confirmed-ref'],
-                        opacity=0.5,
-                        color='red',
-                    ),
-                    text=mouse_over,
-                    hovertemplate=mouse_over,
-                )
-            figg.add_traces(asu_mt)
-            #st.text(df2[df2['institution']=="Arizona State University"])
-            node_trace = go.Scattergeo(
-                    lat=df2["lon"],
-                    lon=df2["lat"],
-                    marker=dict(
-                        size=5.0,  # data['Confirmed-ref'],
-                        opacity=0.9,
-                        color=[],
-                    ),
-                    text=mouse_over,
-                    hovertemplate=mouse_over,
-                )
-
-
-            #node_adjacencies = []
-            #node_text = []
-            #for node, adjacencies in enumerate(second.adjacency()):
-            #    node_adjacencies.append(len(adjacencies[1]))
-                #node_text.append('# of connections: '+str(len(adjacencies[1])))
-
-            #node_trace.marker.color = node_adjacencies
-            #node_trace.text = node_te
-            figg.add_trace(node_trace)
-
-
-            figg["layout"]["width"] = 1025
-            figg["layout"]["height"] = 1025
-            #figg["layout"]["showarrow"] = True
-
+            figg = fast_interact_net(dfj,second,dfj)
             st.write(figg)
-        # Customize layout
-        #    layout = go.Layout(
-        #        paper_bgcolor="rgba(0,0,0,0)",  # transparent background
-        #        plot_bgcolor="rgba(0,0,0,0)",  # transparent 2nd background
-        #        xaxis={"showgrid": False, "zeroline": False},  # no gridlines
-        #        yaxis={"showgrid": False, "zeroline": False},  # no gridlines
-        #    )  # Create figure
-        #    layout["width"] = 925
-        #    layout["height"] = 925
+
+
 
     selection = [False,True]
     local_net = st.sidebar.radio("Jittered ASU local Net",selection)
