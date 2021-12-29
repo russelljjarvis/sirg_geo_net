@@ -197,7 +197,7 @@ def fast_interact_net(dfj,second):
     figg.add_trace(node_trace)
 
 
-    figg.update_layout(projection_type = "orthographic")
+    #figg.update_layout(projection_type = "orthographic")
 
 
     figg["layout"]["width"] = 1825
