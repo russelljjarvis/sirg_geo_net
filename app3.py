@@ -200,8 +200,8 @@ def fast_interact_net(dfj,second):
     #figg.update_layout(projection_type = "orthographic")
 
 
-    figg["layout"]["width"] = 1825
-    figg["layout"]["height"] = 1825
+    figg["layout"]["width"] = 1525
+    figg["layout"]["height"] = 1525
     return figg
 
 
