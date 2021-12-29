@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(layout="wide")
 import pickle
 import pandas as pd
 import geopandas
@@ -200,8 +201,8 @@ def fast_interact_net(dfj,second):
     #figg.update_layout(projection_type = "orthographic")
 
 
-    figg["layout"]["width"] = 1525
-    figg["layout"]["height"] = 1525
+    figg["layout"]["width"] = 1425
+    figg["layout"]["height"] = 1425
     return figg
 
 
@@ -357,7 +358,9 @@ def main():
             st.pyplot(plt,use_column_width=False,width=None)
         if user_input3=="interactive":
             figg = fast_interact_net(dfj,second)
-            st.write(figg)
+            st.plotly_chart(figg, use_container_width=True)
+
+            #st.write(figg)
 
 
 
