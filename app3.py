@@ -76,7 +76,7 @@ def get_data():
 
 
 @st.cache
-def fast_interact_net(dfj,second,dfj):
+def fast_interact_net(dfj,second):
     tab10 = sns.color_palette("bright")
     colors = []
     cnt=0
@@ -186,6 +186,9 @@ def fast_interact_net(dfj,second,dfj):
         )
 
     figg.add_trace(node_trace)
+
+
+    figg.update_layout(projection_type = "orthographic")
 
 
     figg["layout"]["width"] = 1825
@@ -348,7 +351,7 @@ def main():
             st.write(figg)
 
 
- 
+
     selection = [False,True]
     local_net = st.sidebar.radio("Jittered ASU local Net",selection)
 
