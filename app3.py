@@ -13,9 +13,14 @@ import copy
 
 try:
     from streamlit import beta_expander
-    expander = beta_expander
+    st.expander = beta_expander
+    st.sidebar.expander = beta_expander
+
 except:
     from streamlit import expander
+    st.expander = expander
+    st.sidebar.expander = expander
+
 def disable_logo(plot, element):
     plot.state.toolbar.logo = None
 
