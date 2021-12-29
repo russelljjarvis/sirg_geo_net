@@ -356,7 +356,7 @@ def main():
             plt.text(-111.93316158417922, 33.42152185,"Arizona State University",size=25)
             st.pyplot(plt,use_column_width=False,width=None)
         if user_input3=="interactive":
-            figg = fast_interact_net(dfj,second,dfj)
+            figg = fast_interact_net(dfj,second)
             st.write(figg)
 
 
