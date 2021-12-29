@@ -11,7 +11,11 @@ import networkx as nx
 import numpy as np
 import copy
 
-
+try:
+    from streamlit import beta_expander
+    expander = beta_expander
+except:
+    from streamlit import expander
 def disable_logo(plot, element):
     plot.state.toolbar.logo = None
 
